@@ -3,13 +3,14 @@
 ORM used is [TypeORM](https://typeorm.io/#/)
 
 DATABASE used is [MySQL2](https://github.com/sidorares/node-mysql2#readme) 
->NB! should be installed separately
+>NB! DATABASE should be installed separately and running at the specified host:port
 
 ## ENVIRONMENT 
 
-env variables can be configured in root `.env` file:
+env variables should be configured in root `.env` file:
+
 ```
-// app exposed port and mode development | production
+// app port and running mode: <development | production>
 PORT=3030
 NODE_ENV=development
 
