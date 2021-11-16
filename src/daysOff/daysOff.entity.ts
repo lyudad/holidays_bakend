@@ -37,7 +37,7 @@ export class DaysOff {
   @Column({
     type: "enum",
     enum: statusType,
-    defaultValue: statusType.PENDING,
+    default: statusType.PENDING,
   })
   status: statusType;
 }
