@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 // import { User } from 'user/user.entity';
 
@@ -27,14 +28,14 @@ export class DaysOff {
   end_day: Date;
 
   @Column({
-    type: 'enum',
+    type: "enum",
     enum: daysOffType,
     default: daysOffType.VACATION,
   })
   type: daysOffType;
 
   @Column({
-    type: 'enum',
+    type: "enum",
     enum: statusType,
     defaultValue: statusType.PENDING,
   })

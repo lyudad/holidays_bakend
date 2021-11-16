@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   Entity,
   Column,
@@ -5,7 +6,7 @@ import {
   OneToMany,
   JoinTable,
 } from 'typeorm';
-import { DaysOff } from 'daysOff/daysOff.entity';
+import { DaysOff } from '../daysOff/daysOff.entity';
 
 export enum UserRole {
   EMPLOYEE = 'employee',
@@ -31,7 +32,7 @@ export class User {
   password: string;
 
   @Column({
-    type: 'enum',
+    type: "enum",
     enum: UserRole,
     default: UserRole.EMPLOYEE,
   })
@@ -43,7 +44,7 @@ export class User {
   @Column({ type: Date })
   created_at: string;
 
-  @OneToMany(() => DaysOff, (user_id) => DaysOff)
-  @JoinTable()
-  user: user_id[];
+  // @OneToMany(() => (DaysOff) => user_id)
+  // @JoinTable()
+  // user: user_id[];
 }
