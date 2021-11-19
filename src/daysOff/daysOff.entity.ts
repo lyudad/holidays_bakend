@@ -1,5 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
-// import { User } from 'user/user.entity';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { User } from '../user/user.entity';
 
 export enum daysOffType {
   VACATION = 'vacation',
@@ -14,11 +14,11 @@ export enum statusType {
 
 @Entity()
 export class DaysOff {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn()
   id: string;
 
-  @Column()
-  user_id: number;
+  @ManyToOne(() => User, (user) => user.id)
+  user: User;
 
   @Column()
   start_day: Date;

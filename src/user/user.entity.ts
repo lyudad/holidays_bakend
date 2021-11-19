@@ -1,10 +1,4 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  OneToMany,
-  JoinTable,
-} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { DaysOff } from '../daysOff/daysOff.entity';
 
 export enum UserRole {
@@ -15,8 +9,8 @@ export enum UserRole {
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column()
   first_name: string;
@@ -41,9 +35,8 @@ export class User {
   is_blocked: boolean;
 
   @Column({ type: Date })
-  created_at: string;
+  created_at: Date;
 
-  // @OneToMany(() => (DaysOff) => user_id)
-  // @JoinTable()
-  // user: user_id[];
+  @OneToMany(() => DaysOff, (daysOff) => daysOff.user)
+  daysOff: DaysOff[];
 }

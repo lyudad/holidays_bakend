@@ -2,15 +2,10 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import configuration from './config/configuration';
 import { AppController } from './app.controller';
+import { UserController } from './user/user.controller';
 import { AppService } from './app.service';
 import { User } from './user/user.entity';
-import { UsersModule } from './user/user.module';
-// import * as dotenv from 'dotenv';
-// dotenv.config();
-
-// const { DB_PORT, DB_HOST, DB_USERNAME, DB_PASSWORD, DATABASE, NODE_ENV } =
-//   process.env;
-// console.log(DB_USERNAME);
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -18,6 +13,7 @@ import { UsersModule } from './user/user.module';
       load: [configuration],
     }),
   ],
+  // imports: [UserModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -5,32 +5,51 @@ import {
   Header,
   HttpCode,
   HttpStatus,
-  Delete,
   Param,
   Post,
-  UseGuards,
-  Put,
+  Patch,
 } from '@nestjs/common';
-// import { User } from './user.entity';
+import { User } from './user.entity';
 // import { UpdateResult } from 'typeorm';
-import { CreateUserDto, LoginUserDto, UpdateUserDto } from './user.dto';
+import {
+  CreateUserDto,
+  UpdateUserDto,
+  LoginUserDto,
+  BlockUserDto,
+  UserDto,
+} from './user.dto';
+import { UserService } from './user.service';
 
-@Controller('user')
+@Controller('/user')
 export class UserController {
+  constructor(private readonly userService: UserService) {}
+
   @Post()
-  async create(@Body() createUserDto: CreateUserDto) {
-    return 'new user created';
+  createUser(@Body() dto: CreateUserDto) {
+    return this.userService.createUser(dto);
   }
-  async login(@Body() loginUserDto: LoginUserDto) {
-    return 'login sucsses';
-  }
-  @Put('id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return `this action update a #${id} user`;
+  // @Post('/login')
+  // login(@Body() loginUserDto: LoginUserDto) {
+  //   return UsersService.loginUser(loginUserDto);
+  // }
+
+  @Post('/block')
+  blockUser(@Body() dto: BlockUserDto) {
+    return this.userService.blockUser(dto);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return `this action return a #${id}user`;
+  @Patch('/:id')
+  updateUser(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return ' обновленный пользователь ';
+  }
+
+  @Get()
+  findOne(@Body() user: UserDto) {
+    return this.userService.findOneByEmail(user.email);
+  }
+
+  @Get()
+  findAll() {
+    return 'все позователи';
   }
 }
