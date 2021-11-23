@@ -12,6 +12,7 @@ import { UserModule } from './user/user.module';
     ConfigModule.forRoot({
       load: [configuration],
     }),
+    UserModule,
   ],
   // imports: [UserModule],
   controllers: [AppController],
