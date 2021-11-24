@@ -7,7 +7,7 @@ const { DB_PORT, DB_HOST, DB_USERNAME, DB_PASSWORD, DATABASE, NODE_ENV } =
 console.log(DB_USERNAME);
 
 export default () => ({
-  port: parseInt(process.env.PORT, 10) || 3000,
+  port: parseInt(process.env.PORT, 10) || 3030,
   database: {
     type: 'mysql',
     host: DB_HOST,

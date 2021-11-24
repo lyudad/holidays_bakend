@@ -39,7 +39,7 @@ export class UserController {
   }
 
   @Patch('/:id')
-  updateUser(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  updateUser(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
     return ' обновленный пользователь ';
   }
 

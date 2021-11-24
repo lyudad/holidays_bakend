@@ -22,13 +22,25 @@ export class UserService {
       const password = uuid4().toString();
       const newUser = { ...dto, password };
       const user = await this.userRepository.create(newUser);
+      console.log(user);
       return user;
     } catch (e) {
       console.log(e.message);
     }
   }
 
-  // async findAll(): Promise<User> {
+  findAll(): Promise<User[]> {
+    // const users = await this.userRepository.findAll({
+    //   include: { all: true },
+    // });
+    return this.userRepository.find();
+  }
+
+  findOne(id: number): Promise<User> {
+    return this.userRepository.findOne(id);
+  }
+
+  //   async findAll(): Promise<User> {
   //   const users = await this.userRepository.findAll({
   //     include: { all: true },
   //   });
