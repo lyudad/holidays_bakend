@@ -9,7 +9,7 @@ import {
   Post,
   Patch,
 } from '@nestjs/common';
-import { User } from './user.entity';
+import { User } from '../entities/user.entity';
 // import { UpdateResult } from 'typeorm';
 import {
   CreateUserDto,

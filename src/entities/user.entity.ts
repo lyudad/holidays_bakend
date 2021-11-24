@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
-import { DaysOff } from '../daysOff/daysOff.entity';
+import { DaysOff } from './daysOff.entity';
 
 export enum UserRole {
   EMPLOYEE = 'employee',
