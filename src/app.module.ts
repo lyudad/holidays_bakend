@@ -6,8 +6,6 @@ import { UserController } from './user/user.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 
-import ormconfig from './config/ormconfig';
-
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -28,7 +26,8 @@ import ormconfig from './config/ormconfig';
           database: configService.get<string>('DATABASE'),
           entities: [__dirname + '/entities/*.entity{.ts,.js}'],
           logging: true,
-          synchronize: true,
+          autoLoadEntities: true,
+          // synchronize: true,
         };
       },
       inject: [ConfigService],
