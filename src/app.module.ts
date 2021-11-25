@@ -1,22 +1,40 @@
 import { Module } from '@nestjs/common';
-// import { ConfigModule } from '@nestjs/config';
-// import configuration from './config/configuration';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { UserController } from './user/user.controller';
 import { AppService } from './app.service';
-import { User } from './user/user.entity';
 import { UserModule } from './user/user.module';
 
-import { TypeOrmModule } from '@nestjs/typeorm';
 import ormconfig from './config/ormconfig';
+
 @Module({
-  // imports: [
-  //   ConfigModule.forRoot({
-  //     load: [configuration],
-  //   }),
-  //   UserModule,
-  // ],
-  imports: [TypeOrmModule.forRoot(ormconfig), UserModule],
+  imports: [
+    ConfigModule.forRoot(),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => {
+        console.log(
+          'configService.get<string>(',
+          configService.get<string>('DB_DATABASE'),
+          __dirname + '/entities/*.entity{.ts,.js}',
+        );
+        return {
+          type: 'mysql',
+          host: configService.get<string>('DB_HOST'),
+          port: 3306,
+          username: configService.get<string>('DB_USERNAME'),
+          password: configService.get<string>('DB_PASSWORD'),
+          database: configService.get<string>('DATABASE'),
+          entities: [__dirname + '/entities/*.entity{.ts,.js}'],
+          logging: true,
+          synchronize: true,
+        };
+      },
+      inject: [ConfigService],
+    }),
+    UserModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

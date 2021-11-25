@@ -2,7 +2,9 @@ import { HttpStatus, HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuid4 } from 'uuid';
-import { User } from './user.entity';
+import { EntityRepository } from 'typeorm';
+import { UserRepository } from './user.repository';
+import { User } from 'src/entities/user.entity';
 import {
   CreateUserDto,
   UpdateUserDto,
@@ -12,10 +14,7 @@ import {
 
 @Injectable()
 export class UserService {
-  constructor(
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
-  ) {}
+  constructor(private userRepository: UserRepository) {}
 
   async createUser(dto: CreateUserDto): Promise<User> {
     try {
@@ -33,6 +32,7 @@ export class UserService {
     // const users = await this.userRepository.findAll({
     //   include: { all: true },
     // });
+    // return users;
     return this.userRepository.find();
   }
 

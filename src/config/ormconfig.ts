@@ -1,6 +1,6 @@
 import { ConnectionOptions } from 'typeorm';
-import { User } from '../user/user.entity';
-import { DaysOff } from '../daysOff/daysOff.entity';
+import { User } from '../entities/user.entity';
+import { DaysOff } from '../entities/daysOff.entity';
 
 const config: ConnectionOptions = {
   type: 'mysql',

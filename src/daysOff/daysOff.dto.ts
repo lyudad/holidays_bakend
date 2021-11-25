@@ -8,8 +8,7 @@ import {
   IsBoolean,
 } from 'class-validator';
 
-import { daysOffType } from './daysOff.entity';
-import { statusType } from './daysOff.entity';
+import { daysOffType, statusType } from 'src/entities/daysOff.entity';
 
 export class CreateDaysOffDto {
   @IsNotEmpty()
