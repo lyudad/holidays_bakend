@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
-import { DaysOff } from './daysOff.entity';
+// import { DaysOff } from './daysOff.entity';
 
 export enum UserRole {
   EMPLOYEE = 'employee',
@@ -37,6 +37,6 @@ export class User {
   @Column({ type: Date })
   created_at: Date;
 
-  @OneToMany(() => DaysOff, (daysOff) => daysOff.user)
-  daysOff: DaysOff[];
+  // @OneToMany(() => DaysOff, (daysOff) => daysOff.user)
+  // daysOff: DaysOff[];
 }

@@ -1,6 +1,5 @@
 import { ConnectionOptions } from 'typeorm';
 import { User } from '../entities/user.entity';
-import { DaysOff } from '../entities/daysOff.entity';
 
 const config: ConnectionOptions = {
   type: 'mysql',
@@ -9,7 +8,7 @@ const config: ConnectionOptions = {
   username: 'holiday',
   password: 'gY84jdvny7D',
   database: 'holiday',
-  entities: [User, DaysOff],
+  entities: [User],
   synchronize: true,
 };
 
