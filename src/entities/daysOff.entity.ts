@@ -15,7 +15,7 @@ export enum statusType {
 @Entity()
 export class DaysOff {
   @PrimaryGeneratedColumn()
-  id: string;
+  id: number;
 
   @ManyToOne(() => User, (user) => user.id)
   user: User;

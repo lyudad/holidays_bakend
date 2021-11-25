@@ -16,6 +16,7 @@ export default () => ({
     password: DB_PASSWORD,
     database: DATABASE,
     entities: [User],
-    synchronize: NODE_ENV === 'production' ? false : true,
+    synchronize: true,
+    // synchronize: NODE_ENV === 'production' ? false : true,
   },
 });
