@@ -1,6 +1,6 @@
 import { HttpStatus, HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Connection } from 'typeorm';
 import { v4 as uuid4 } from 'uuid';
 import { EntityRepository } from 'typeorm';
 import { UserRepository } from './user.repository';
@@ -16,7 +16,7 @@ import {
 export class UserService {
   constructor(private userRepository: UserRepository) {}
 
-  async createUser(dto: CreateUserDto): Promise<User> {
+  async create(dto: CreateUserDto): Promise<User> {
     try {
       const password = uuid4().toString();
       const newUser = { ...dto, password };
@@ -36,45 +36,57 @@ export class UserService {
     return this.userRepository.find();
   }
 
-  findOne(id: number): Promise<User> {
-    return this.userRepository.findOne(id);
+  async findForLogin(email: string, password: string) {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.email=:email', { email })
+      .getOneOrFail()
+      .catch(() => {
+        // throw new BadRequestException('user not faund');
+        return 'user not found';
+      });
+
+    return user;
   }
 
-  //   async findAll(): Promise<User> {
-  //   const users = await this.userRepository.findAll({
-  //     include: { all: true },
-  //   });
-  //   return users;
+  // async findOneById(id: number): Promise<User> {
+  //   return await this.userRepository.findOne({ where: { id } });
   // }
 
-  async findOneByEmail(email: string): Promise<User> {
-    try {
-      const user = await this.userRepository.findOne({
-        where: { email: email },
-        // include: { all: true },
-      });
-      return user;
-    } catch (e) {
-      console.log(e.message);
-    }
-  }
+  // async findOneById(id: number): Promise<User> {
+  //   const user = await getRepository(UserRepository)
+  //     .createQueryBuilder('user')
+  //     .where('user.id = :id', { id: id })
+  //     .getOne();
+  // }
 
-  // async updateUser(id: string, dto: UpdateUserDto): Promise<User> {
+  // async findOneByEmail(email: string): Promise<User> {
   //   try {
-  //     const Id = parseInt(id);
   //     const user = await this.userRepository.findOne({
-  //       where: { id: Id },
+  //       where: { email: email },
   //     });
-  //     if (!user) {
-  //       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
-  //     }
-  //     return this.userRepository.updateOne({ where: { id: Id } }, dto);
+  //     return user;
   //   } catch (e) {
   //     console.log(e.message);
   //   }
   // }
 
-  async blockUser(dto: BlockUserDto): Promise<User> {
+  // async updateUser(userId: string, dto: UpdateUserDto): Promise<User> {
+  //   try {
+  //     const id = parseInt(userId);
+  //     const user = await this.userRepository.findOne({
+  //       where: { id },
+  //     });
+  //     if (!user) {
+  //       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+  //     }
+  //     return this.userRepository.update({ where: { id } }, dto);
+  //   } catch (e) {
+  //     console.log(e.message);
+  //   }
+  // }
+
+  async blockUser(dto: BlockUserDto) {
     try {
       const user = await this.userRepository.findOne(dto.id);
       if (!user) {

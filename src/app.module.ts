@@ -2,9 +2,11 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
-import { UserController } from './user/user.controller';
+// import { UserController } from './user/user.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
+// import { AuthModule } from './auth/auth.module';
+// import { AuthService } from './auth/auth.service';
 
 @Module({
   imports: [
@@ -27,7 +29,7 @@ import { UserModule } from './user/user.module';
           entities: [__dirname + '/entities/*.entity{.ts,.js}'],
           logging: true,
           autoLoadEntities: true,
-          // synchronize: true,
+          synchronize: true,
         };
       },
       inject: [ConfigService],

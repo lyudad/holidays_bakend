@@ -23,10 +23,14 @@ import { UserService } from './user.service';
 @Controller('/user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+  // @Get()
+  // findOneById(@Param() id: number) {
+  //   return this.userService.findOneById(id);
+  // }
 
   @Post()
   createUser(@Body() dto: CreateUserDto) {
-    return this.userService.createUser(dto);
+    return this.userService.create(dto);
   }
   // @Post('/login')
   // login(@Body() loginUserDto: LoginUserDto) {
@@ -42,11 +46,15 @@ export class UserController {
   updateUser(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
     return ' обновленный пользователь ';
   }
-
-  @Get()
-  findOne(@Body() user: UserDto) {
-    return this.userService.findOneByEmail(user.email);
+  @Get('/login')
+  findForLogin(@Body() email: string, password: string) {
+    console.log(email);
+    return this.userService.findForLogin(email, password);
   }
+  // @Get()
+  // findOne(@Body() user: UserDto) {
+  //   return this.userService.findOneByEmail(user.email);
+  // }
 
   @Get()
   findAll() {
