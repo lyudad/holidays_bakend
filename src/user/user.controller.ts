@@ -47,9 +47,8 @@ export class UserController {
     return ' обновленный пользователь ';
   }
   @Get('/login')
-  findForLogin(@Body() email: string, password: string) {
-    console.log(email);
-    return this.userService.findForLogin(email, password);
+  findForLogin(@Body() dto: LoginUserDto) {
+    return this.userService.findForLogin(dto);
   }
   // @Get()
   // findOne(@Body() user: UserDto) {

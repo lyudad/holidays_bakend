@@ -36,6 +36,8 @@ export class User {
 
   @Column({ type: Date })
   created_at: Date;
+  @Column()
+  token: string;
 
   @OneToMany(() => DaysOff, (daysOff) => daysOff.user)
   daysOff: DaysOff[];

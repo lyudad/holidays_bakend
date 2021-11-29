@@ -7,10 +7,15 @@ import { UserRepository } from './user.repository';
 import { User } from 'src/entities/user.entity';
 import {
   CreateUserDto,
+  FindByEmailDto,
   UpdateUserDto,
   LoginUserDto,
   BlockUserDto,
 } from './user.dto';
+
+const jwt = require('jsonwebtoken');
+
+const bcrypt = require('bcrypt');
 
 @Injectable()
 export class UserService {
@@ -18,8 +23,12 @@ export class UserService {
 
   async create(dto: CreateUserDto): Promise<User> {
     try {
-      const password = uuid4().toString();
-      const newUser = { ...dto, password };
+      const uuidPass = uuid4().toString().split('-').slice(0, 1);
+      const genPassword = uuidPass[0].toString();
+      // шифруем пароль передсохранением в базе
+      const password = bcrypt.hashSync(genPassword, bcrypt.genSaltSync(10));
+      // console.log(password);
+      const newUser = { ...dto, genPassword };
       const user = await this.userRepository.create(newUser);
       console.log(user);
       return user;
@@ -29,24 +38,46 @@ export class UserService {
   }
 
   findAll(): Promise<User[]> {
-    // const users = await this.userRepository.findAll({
-    //   include: { all: true },
-    // });
-    // return users;
     return this.userRepository.find();
   }
 
-  async findForLogin(email: string, password: string) {
+  async findOne({ email }: FindByEmailDto) {
     const user = await this.userRepository
       .createQueryBuilder('user')
       .where('user.email=:email', { email })
       .getOneOrFail()
-      .catch(() => {
-        // throw new BadRequestException('user not faund');
-        return 'user not found';
+      .catch((error) => {
+        console.log('error', error);
+        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
       });
-
     return user;
+  }
+
+  async findForLogin({ email, password }: LoginUserDto): Promise<any> {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.email=:email', { email })
+      .getOneOrFail()
+      .catch((error) => {
+        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+        console.log(error.message);
+      });
+    if (user.password !== password) {
+      return 'error';
+    }
+    const payload = { id: user.id, name: user.first_name };
+    const secret = 'secret word';
+    const token = jwt.sign(payload, secret);
+    const result = {
+      id: user.id,
+      first_name: user.first_name,
+      role: user.role,
+      is_blocked: user.is_blocked,
+      token,
+    };
+
+    console.log(result);
+    return result;
   }
 
   // async findOneById(id: number): Promise<User> {
@@ -58,17 +89,6 @@ export class UserService {
   //     .createQueryBuilder('user')
   //     .where('user.id = :id', { id: id })
   //     .getOne();
-  // }
-
-  // async findOneByEmail(email: string): Promise<User> {
-  //   try {
-  //     const user = await this.userRepository.findOne({
-  //       where: { email: email },
-  //     });
-  //     return user;
-  //   } catch (e) {
-  //     console.log(e.message);
-  //   }
   // }
 
   // async updateUser(userId: string, dto: UpdateUserDto): Promise<User> {
@@ -99,18 +119,18 @@ export class UserService {
     }
   }
 
-  async loginUser(dto: LoginUserDto) {
-    const email = dto.email;
-    const user = await await this.userRepository.findOne({
-      where: { email: email },
-      // include: { all: true },
-    });
-    if (!user) {
-      throw new HttpException('Not found', HttpStatus.NOT_FOUND);
-    }
-    if (user.password === dto.password) {
-      return user;
-    }
-    throw new HttpException('Not found', HttpStatus.NOT_FOUND);
-  }
+  // async loginUser(dto: LoginUserDto) {
+  //   const email = dto.email;
+  //   const user = await await this.userRepository.findOne({
+  //     where: { email: email },
+  //     // include: { all: true },
+  //   });
+  //   if (!user) {
+  //     throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+  //   }
+  //   if (user.password === dto.password) {
+  //     return user;
+  //   }
+  //   throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+  // }
 }

@@ -67,6 +67,11 @@ export class CreateUserDto {
   readonly created_at: Date;
 }
 
+export class FindByEmailDto {
+  @IsNotEmpty()
+  readonly email: string;
+}
+
 export class LoginUserDto {
   @IsNotEmpty()
   @IsEmail()
