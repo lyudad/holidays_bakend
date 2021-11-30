@@ -10,7 +10,7 @@ import {
   Patch,
 } from '@nestjs/common';
 import { User } from '../entities/user.entity';
-// import { UpdateResult } from 'typeorm';
+import { UpdateResult } from 'typeorm';
 import {
   CreateUserDto,
   UpdateUserDto,
@@ -46,10 +46,11 @@ export class UserController {
   updateUser(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
     return ' обновленный пользователь ';
   }
-  @Get('/login')
+  @Post('/login')
   findForLogin(@Body() dto: LoginUserDto) {
     return this.userService.findForLogin(dto);
   }
+
   // @Get()
   // findOne(@Body() user: UserDto) {
   //   return this.userService.findOneByEmail(user.email);

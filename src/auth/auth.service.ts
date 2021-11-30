@@ -1,65 +1,63 @@
-// import { Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 // import * as bcrypt from 'bcrypt';
-// // import { JwtService } from '@nestjs/jwt';
-// import { UserService } from '../user/user.service';
-// import { User } from '../entities/user.entity';
-// @Injectable()
-// export class AuthService {
-//   constructor(
-//     private readonly userService: UserService, // private readonly jwtService: JwtService,
-//   ) {}
+// import { JwtService } from '@nestjs/jwt';
+import { UserService } from '../user/user.service';
+import { User } from '../entities/user.entity';
 
-//   async validateUser(username: string, pass: string): Promise<User> {
-//     const email = username;
-//     const user: User = await this.userService.findOne(email);
-//     if (user && user.password === pass) {
-//       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-//       const { password, ...result } = user;
-//       return result;
-//     }
+@Injectable()
+export class AuthService {
+  constructor(private readonly userService: UserService) {}
 
-// find if user password match
-// const match = await this.comparePassword(pass, user.password);
-// if (!match) {
-//   return null;
-// }
-//   return null;
-// }
+  async validateUser(email: string, pass: string): Promise<any> {
+    const user = await this.userService.findOne({ email });
+    if (user && user.password === pass) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, ...result } = user;
+      return result;
+    }
 
-// public async login(user) {
-//   const token = await this.generateToken(user);
-//   return { user, token };
-// }
+    // find if user password match
+    // const match = await this.comparePassword(pass, user.password);
+    // if (!match) {
+    //   return null;
+    // }
+    return null;
+  }
 
-// public async create(user) {
-//   // hash the password
-//   const pass = await this.hashPassword(user.password);
+  // public async login(user) {
+  //   const token = await this.generateToken(user);
+  //   return { user, token };
+  // }
 
-//   // create the user
-//   const newUser = await this.userService.create({ ...user, password: pass });
+  // public async create(user) {
+  //   // hash the password
+  //   const pass = await this.hashPassword(user.password);
 
-//   // tslint:disable-next-line: no-string-literal
-//   const { password, ...result } = newUser['dataValues'];
+  //   // create the user
+  //   const newUser = await this.userService.create({ ...user, password: pass });
 
-//   // generate token
-//   const token = await this.generateToken(result);
+  //   // tslint:disable-next-line: no-string-literal
+  //   const { password, ...result } = newUser['dataValues'];
 
-//   // return the user and the token
-//   return { user: result, token };
-// }
+  //   // generate token
+  //   const token = await this.generateToken(result);
 
-// private async generateToken(user) {
-//   const token = await this.jwtService.signAsync(user);
-//   return token;
-// }
+  //   // return the user and the token
+  //   return { user: result, token };
+  // }
 
-// private async hashPassword(password) {
-//   const hash = await bcrypt.hash(password, 10);
-//   return hash;
-// }
+  // private async generateToken(user) {
+  //   const token = await this.jwtService.signAsync(user);
+  //   return token;
+  // }
 
-// private async comparePassword(enteredPassword, dbPassword) {
-//   const match = await bcrypt.compare(enteredPassword, dbPassword);
-//   return match;
-// }
-// }
+  // private async hashPassword(password) {
+  //   const hash = await bcrypt.hash(password, 10);
+  //   return hash;
+  // }
+
+  // private async comparePassword(enteredPassword, dbPassword) {
+  //   const match = await bcrypt.compare(enteredPassword, dbPassword);
+  //   return match;
+  // }
+}

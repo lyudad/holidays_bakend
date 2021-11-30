@@ -5,7 +5,8 @@ import { AppController } from './app.controller';
 // import { UserController } from './user/user.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
-// import { AuthModule } from './auth/auth.module';
+import { AuthModule } from './auth/auth.module';
+
 // import { AuthService } from './auth/auth.service';
 
 @Module({
@@ -35,6 +36,7 @@ import { UserModule } from './user/user.module';
       inject: [ConfigService],
     }),
     UserModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

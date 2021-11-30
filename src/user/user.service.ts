@@ -41,7 +41,7 @@ export class UserService {
     return this.userRepository.find();
   }
 
-  async findOne({ email }: FindByEmailDto) {
+  async findOne(email: FindByEmailDto) {
     const user = await this.userRepository
       .createQueryBuilder('user')
       .where('user.email=:email', { email })
