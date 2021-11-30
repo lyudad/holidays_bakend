@@ -19,6 +19,8 @@ import {
   UserDto,
 } from './user.dto';
 import { UserService } from './user.service';
+// import { Roles } from '../role/roles.decorator';
+// import { Role } from '../role/role.enum';
 
 @Controller('/user')
 export class UserController {
@@ -32,10 +34,6 @@ export class UserController {
   createUser(@Body() dto: CreateUserDto) {
     return this.userService.create(dto);
   }
-  // @Post('/login')
-  // login(@Body() loginUserDto: LoginUserDto) {
-  //   return UsersService.loginUser(loginUserDto);
-  // }
 
   @Post('/block')
   blockUser(@Body() dto: BlockUserDto) {
@@ -50,11 +48,6 @@ export class UserController {
   findForLogin(@Body() dto: LoginUserDto) {
     return this.userService.findForLogin(dto);
   }
-
-  // @Get()
-  // findOne(@Body() user: UserDto) {
-  //   return this.userService.findOneByEmail(user.email);
-  // }
 
   @Get()
   findAll() {
