@@ -25,8 +25,15 @@ export class AuthService {
       sub: user.id,
       userRole: user.role,
     };
+    if (user.is_blocked) {
+      return 'user blocked, contact the administration';
+    }
     return {
       access_token: this.jwtService.sign(payload),
+      id: user.id,
+      name: user.first_name,
+      role: user.role,
+      is_blocked: user.is_blocked,
     };
   }
 }

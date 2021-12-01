@@ -25,7 +25,7 @@ export class UserService {
     try {
       const uuidPass = uuid4().toString().split('-').slice(0, 1);
       const genPassword = uuidPass[0].toString();
-      // шифруем пароль передсохранением в базе
+      // шифруем пароль перед сохранением в базе
       const password = bcrypt.hashSync(genPassword, bcrypt.genSaltSync(10));
       // console.log(password);
       const newUser = { ...dto, genPassword };
@@ -37,8 +37,15 @@ export class UserService {
     }
   }
 
-  findAll(): Promise<User[]> {
-    return this.userRepository.find();
+  async findAll(): Promise<User[]> {
+    const users = await this.userRepository
+      .createQueryBuilder('user')
+      .getMany()
+      .catch((error) => {
+        console.log(error.message);
+        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      });
+    return users;
   }
 
   async findOne({ email }: FindByEmailDto) {
@@ -80,17 +87,26 @@ export class UserService {
     return result;
   }
 
-  // async findOneById(id: number): Promise<User> {
-  //   return await this.userRepository.findOne({ where: { id } });
-  // }
+  async findOneById(id: number): Promise<any> {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.id = :id', { id: id })
+      .getOneOrFail()
+      .catch((error) => {
+        console.log('error', error);
+        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      });
+    const { password, ...data } = user;
+    return data;
+  }
 
-  // async findOneById(id: number): Promise<User> {
-  //   const user = await getRepository(UserRepository)
-  //     .createQueryBuilder('user')
-  //     .where('user.id = :id', { id: id })
-  //     .getOne();
-  // }
-
+  async findDaysOffByUser(id: number): Promise<any> {
+    const daysOff = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('daysOff.user', 'daysOff')
+      .where('user.id = :id', { id })
+      .getOne();
+  }
   // async updateUser(userId: string, dto: UpdateUserDto): Promise<User> {
   //   try {
   //     const id = parseInt(userId);

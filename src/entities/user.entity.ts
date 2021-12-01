@@ -36,7 +36,10 @@ export class User {
 
   @Column({ type: Date })
   created_at: Date;
-  @Column()
+
+  @Column({
+    default: 'null',
+  })
   token: string;
 
   @OneToMany(() => DaysOff, (daysOff) => daysOff.user)
