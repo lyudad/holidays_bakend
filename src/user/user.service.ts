@@ -108,7 +108,6 @@ export class UserService {
       .getOne();
   }
 
-
   async blockUser(dto: BlockUserDto) {
     try {
       const user = await this.userRepository.findOne(dto.id);
@@ -121,5 +120,4 @@ export class UserService {
       console.log(e.message);
     }
   }
-
-
+}
