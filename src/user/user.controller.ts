@@ -21,7 +21,6 @@ import {
 } from './user.dto';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-// import { Role } from '../role/role.enum';
 
 @Controller('/user')
 export class UserController {
@@ -44,10 +43,6 @@ export class UserController {
   updateUser(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
     return ' обновленный пользователь ';
   }
-  // @Post('/login')
-  // findForLogin(@Body() dto: LoginUserDto) {
-  //   return this.userService.findForLogin(dto);
-  // }
 
   @UseGuards(JwtAuthGuard)
   @Get()

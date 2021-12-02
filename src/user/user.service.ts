@@ -107,20 +107,7 @@ export class UserService {
       .where('user.id = :id', { id })
       .getOne();
   }
-  // async updateUser(userId: string, dto: UpdateUserDto): Promise<User> {
-  //   try {
-  //     const id = parseInt(userId);
-  //     const user = await this.userRepository.findOne({
-  //       where: { id },
-  //     });
-  //     if (!user) {
-  //       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
-  //     }
-  //     return this.userRepository.update({ where: { id } }, dto);
-  //   } catch (e) {
-  //     console.log(e.message);
-  //   }
-  // }
+
 
   async blockUser(dto: BlockUserDto) {
     try {
@@ -135,18 +122,4 @@ export class UserService {
     }
   }
 
-  // async loginUser(dto: LoginUserDto) {
-  //   const email = dto.email;
-  //   const user = await await this.userRepository.findOne({
-  //     where: { email: email },
-  //     // include: { all: true },
-  //   });
-  //   if (!user) {
-  //     throw new HttpException('Not found', HttpStatus.NOT_FOUND);
-  //   }
-  //   if (user.password === dto.password) {
-  //     return user;
-  //   }
-  //   throw new HttpException('Not found', HttpStatus.NOT_FOUND);
-  // }
-}
+
