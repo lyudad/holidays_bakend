@@ -1,6 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpStatus, HttpException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
+import { returnUser, loginData } from '../user/user.types';
+import { User } from '../entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -9,7 +11,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(email: string, pass: string): Promise<any> {
+  async validateUser(email: string, pass: string): Promise<returnUser> {
     const user = await this.userService.findOne({ email });
     if (user && user.password === pass) {
       const { password, ...result } = user;
@@ -18,19 +20,22 @@ export class AuthService {
     return null;
   }
 
-  async login(user: any) {
+  async login(user: User): Promise<loginData> {
     const payload = {
       username: user.first_name,
       sub: user.id,
       userRole: user.role,
     };
     if (user.is_blocked) {
-      return 'user blocked, contact the administration';
+      throw new HttpException(
+        'user blocked, contact the administration',
+        HttpStatus.NOT_FOUND,
+      );
     }
     return {
-      access_token: this.jwtService.sign(payload),
+      token: this.jwtService.sign(payload),
       id: user.id,
-      name: user.first_name,
+      first_name: user.first_name,
       role: user.role,
       is_blocked: user.is_blocked,
     };

@@ -17,27 +17,30 @@ const jwt = require('jsonwebtoken');
 
 const bcrypt = require('bcrypt');
 
+import { returnUser, loginData } from './user.types';
+
 @Injectable()
 export class UserService {
   constructor(private userRepository: UserRepository) {}
 
-  async create(dto: CreateUserDto): Promise<User> {
+  async create(dto: CreateUserDto): Promise<returnUser> {
     try {
       const uuidPass = uuid4().toString().split('-').slice(0, 1);
       const genPassword = uuidPass[0].toString();
       // шифруем пароль перед сохранением в базе
-      const password = bcrypt.hashSync(genPassword, bcrypt.genSaltSync(10));
+      const pass = bcrypt.hashSync(genPassword, bcrypt.genSaltSync(10));
       // console.log(password);
-      const newUser = { ...dto, genPassword };
+      const newUser = { ...dto, pass };
       const user = await this.userRepository.create(newUser);
-      console.log(user);
+      const { password, ...data } = user;
+      console.log(data);
       return user;
     } catch (e) {
       console.log(e.message);
     }
   }
 
-  async findAll(): Promise<User[]> {
+  async findAll(): Promise<returnUser[]> {
     const users = await this.userRepository
       .createQueryBuilder('user')
       .getMany()
@@ -45,10 +48,14 @@ export class UserService {
         console.log(error.message);
         throw new HttpException('Not found', HttpStatus.NOT_FOUND);
       });
-    return users;
+    const rUsers = users.map((user) => {
+      const { password, ...data } = user;
+      return data;
+    });
+    return rUsers;
   }
 
-  async findOne({ email }: FindByEmailDto) {
+  async findOne({ email }: FindByEmailDto): Promise<User> {
     const user = await this.userRepository
       .createQueryBuilder('user')
       .where('user.email=:email', { email })
@@ -60,7 +67,7 @@ export class UserService {
     return user;
   }
 
-  async findForLogin({ email, password }: LoginUserDto): Promise<any> {
+  async findForLogin({ email, password }: LoginUserDto): Promise<loginData> {
     const user = await this.userRepository
       .createQueryBuilder('user')
       .where('user.email=:email', { email })
@@ -70,7 +77,7 @@ export class UserService {
         console.log(error.message);
       });
     if (user.password !== password) {
-      return 'error';
+      throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
     const payload = { id: user.id, name: user.first_name };
     const secret = 'secret word';
@@ -87,7 +94,7 @@ export class UserService {
     return result;
   }
 
-  async findOneById(id: number): Promise<any> {
+  async findOneById(id: number): Promise<returnUser> {
     const user = await this.userRepository
       .createQueryBuilder('user')
       .where('user.id = :id', { id: id })
@@ -108,14 +115,15 @@ export class UserService {
       .getOne();
   }
 
-  async blockUser(dto: BlockUserDto) {
+  async blockUser(dto: BlockUserDto): Promise<returnUser> {
     try {
       const user = await this.userRepository.findOne(dto.id);
       if (!user) {
         throw new HttpException('Not found', HttpStatus.NOT_FOUND);
       }
       user.is_blocked = true;
-      return user;
+      const { password, ...data } = user;
+      return data;
     } catch (e) {
       console.log(e.message);
     }
