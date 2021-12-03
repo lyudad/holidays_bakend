@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { EmailModule } from './mail/mail.module';
 import { UserModule } from './user/user.module';
 
 @Module({
@@ -22,7 +23,7 @@ import { UserModule } from './user/user.module';
           port: 3306,
           username: configService.get<string>('DB_USERNAME'),
           password: configService.get<string>('DB_PASSWORD'),
-          database: configService.get<string>('DATABASE'),
+          database: configService.get<string>('DB_DATABASE'),
           entities: [__dirname + '/entities/*.entity{.ts,.js}'],
           logging: true,
           autoLoadEntities: true,
@@ -32,6 +33,7 @@ import { UserModule } from './user/user.module';
       inject: [ConfigService],
     }),
     UserModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

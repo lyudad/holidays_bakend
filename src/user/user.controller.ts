@@ -57,6 +57,8 @@ export class UserController {
 
   @Get()
   findAll() {
-    return 'все позователи';
+    return [
+      { firstName: 'Buba', lastName: 'Umpa', email: 'poletslova@gmail.com' },
+    ];
   }
 }

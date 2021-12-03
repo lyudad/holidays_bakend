@@ -27,7 +27,7 @@ export class UserService {
       const genPassword = uuidPass[0].toString();
       // шифруем пароль передсохранением в базе
       const password = bcrypt.hashSync(genPassword, bcrypt.genSaltSync(10));
-      // console.log(password);
+      console.log(password);
       const newUser = { ...dto, genPassword };
       const user = await this.userRepository.create(newUser);
       console.log(user);
