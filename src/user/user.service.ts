@@ -17,13 +17,13 @@ const jwt = require('jsonwebtoken');
 
 const bcrypt = require('bcrypt');
 
-import { returnUser, loginData } from './user.types';
+import { IreturnUser, IloginData } from './user.types';
 
 @Injectable()
 export class UserService {
   constructor(private userRepository: UserRepository) {}
 
-  async create(dto: CreateUserDto): Promise<returnUser> {
+  async create(dto: CreateUserDto): Promise<IreturnUser> {
     try {
       const uuidPass = uuid4().toString().split('-').slice(0, 1);
       const genPassword = uuidPass[0].toString();
@@ -40,7 +40,7 @@ export class UserService {
     }
   }
 
-  async findAll(): Promise<returnUser[]> {
+  async findAll(): Promise<IreturnUser[]> {
     const users = await this.userRepository
       .createQueryBuilder('user')
       .getMany()
@@ -67,7 +67,7 @@ export class UserService {
     return user;
   }
 
-  async findForLogin({ email, password }: LoginUserDto): Promise<loginData> {
+  async findForLogin({ email, password }: LoginUserDto): Promise<IloginData> {
     const user = await this.userRepository
       .createQueryBuilder('user')
       .where('user.email=:email', { email })
@@ -94,7 +94,7 @@ export class UserService {
     return result;
   }
 
-  async findOneById(id: number): Promise<returnUser> {
+  async findOneById(id: number): Promise<IreturnUser> {
     const user = await this.userRepository
       .createQueryBuilder('user')
       .where('user.id = :id', { id: id })
@@ -107,15 +107,7 @@ export class UserService {
     return data;
   }
 
-  async findDaysOffByUser(id: number): Promise<any> {
-    const daysOff = await this.userRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('daysOff.user', 'daysOff')
-      .where('user.id = :id', { id })
-      .getOne();
-  }
-
-  async blockUser(dto: BlockUserDto): Promise<returnUser> {
+  async blockUser(dto: BlockUserDto): Promise<IreturnUser> {
     try {
       const user = await this.userRepository.findOne(dto.id);
       if (!user) {

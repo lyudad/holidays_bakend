@@ -55,10 +55,4 @@ export class UserController {
   findOneById(@Param('id') id: number) {
     return this.userService.findOneById(id);
   }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('/daysOff/:id')
-  findDaysOffByUser(@Body('id') id: number) {
-    return this.userService.findDaysOffByUser(id);
-  }
 }

@@ -1,4 +1,4 @@
-export interface returnUser {
+export interface IreturnUser {
   id: number;
   first_name: string;
   last_name: string;
@@ -9,7 +9,7 @@ export interface returnUser {
   token: string;
 }
 
-export interface loginData {
+export interface IloginData {
   token: string;
   id: number;
   first_name: string;
