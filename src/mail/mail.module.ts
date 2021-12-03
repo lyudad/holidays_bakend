@@ -2,7 +2,6 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MailService } from './mail.service';
-// import { DatabaseModule } from 'src/shared/database/database.module';
 import { MailController } from './mail.controller';
 import { CreatePassService } from './userPass.service';
 
@@ -14,8 +13,9 @@ import { CreatePassService } from './userPass.service';
     MailerModule.forRoot({
       transport: {
         port: process.env.MAIL_PORT,
-        service: process.env.MAIL_HOST,
+        host: 'smtp.meta.ua',
         secure: true,
+        ignoreTLS: true,
         auth: {
           user: process.env.MAIL_ID,
           pass: process.env.MAIL_PASS,
