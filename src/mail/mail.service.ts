@@ -10,9 +10,9 @@ export class MailService {
     return this.mailerService.sendMail({
       to: `${user.email}`,
       from: 'zenbit_holidays@meta.ua',
-      subject: 'Welcome!',
+      subject: 'Welcome to Holidays!',
       text: 'Use this password',
-      html: `<b>${user.password}</b>`,
+      html: `<b>Hello, ${user.firstName}, your new password: ${user.password}</b>`,
     });
   }
 }

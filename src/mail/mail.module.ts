@@ -13,7 +13,7 @@ import { CreatePassService } from './userPass.service';
     MailerModule.forRoot({
       transport: {
         port: process.env.MAIL_PORT,
-        host: 'smtp.meta.ua',
+        host: process.env.MAIL_HOST,
         secure: true,
         ignoreTLS: true,
         auth: {
