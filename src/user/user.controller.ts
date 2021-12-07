@@ -8,9 +8,10 @@ import {
   Param,
   Post,
   Patch,
+  UseGuards,
 } from '@nestjs/common';
 import { User } from '../entities/user.entity';
-// import { UpdateResult } from 'typeorm';
+import { UpdateResult } from 'typeorm';
 import {
   CreateUserDto,
   UpdateUserDto,
@@ -19,44 +20,39 @@ import {
   UserDto,
 } from './user.dto';
 import { UserService } from './user.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('/user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-  // @Get()
-  // findOneById(@Param() id: number) {
-  //   return this.userService.findOneById(id);
-  // }
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   createUser(@Body() dto: CreateUserDto) {
     return this.userService.create(dto);
   }
-  // @Post('/login')
-  // login(@Body() loginUserDto: LoginUserDto) {
-  //   return UsersService.loginUser(loginUserDto);
-  // }
 
+  @UseGuards(JwtAuthGuard)
   @Post('/block')
   blockUser(@Body() dto: BlockUserDto) {
     return this.userService.blockUser(dto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch('/:id')
   updateUser(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
     return ' обновленный пользователь ';
   }
-  @Get('/login')
-  findForLogin(@Body() dto: LoginUserDto) {
-    return this.userService.findForLogin(dto);
-  }
-  // @Get()
-  // findOne(@Body() user: UserDto) {
-  //   return this.userService.findOneByEmail(user.email);
-  // }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
-    return 'все позователи';
+    return this.userService.findAll();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/:id')
+  findOneById(@Param('id') id: number) {
+    return this.userService.findOneById(id);
   }
 }
