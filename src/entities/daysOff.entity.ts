@@ -39,7 +39,4 @@ export class DaysOff {
     default: statusType.PENDING,
   })
   status: statusType;
-
-  // @ManyToOne(() => User, (user) => User.daysOff)
-  // user: User.daysOff;
 }

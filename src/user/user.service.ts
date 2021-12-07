@@ -17,45 +17,31 @@ const jwt = require('jsonwebtoken');
 
 const bcrypt = require('bcrypt');
 
-import { IreturnUser, IloginData } from './user.types';
-
 @Injectable()
 export class UserService {
   constructor(private userRepository: UserRepository) {}
 
-  async create(dto: CreateUserDto): Promise<IreturnUser> {
+  async create(dto: CreateUserDto): Promise<User> {
     try {
       const uuidPass = uuid4().toString().split('-').slice(0, 1);
       const genPassword = uuidPass[0].toString();
-      // шифруем пароль перед сохранением в базе
-      const pass = bcrypt.hashSync(genPassword, bcrypt.genSaltSync(10));
+      // шифруем пароль передсохранением в базе
+      const password = bcrypt.hashSync(genPassword, bcrypt.genSaltSync(10));
       // console.log(password);
-      const newUser = { ...dto, pass };
+      const newUser = { ...dto, genPassword };
       const user = await this.userRepository.create(newUser);
-      const { password, ...data } = user;
-      console.log(data);
+      console.log(user);
       return user;
     } catch (e) {
       console.log(e.message);
     }
   }
 
-  async findAll(): Promise<IreturnUser[]> {
-    const users = await this.userRepository
-      .createQueryBuilder('user')
-      .getMany()
-      .catch((error) => {
-        console.log(error.message);
-        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
-      });
-    const rUsers = users.map((user) => {
-      const { password, ...data } = user;
-      return data;
-    });
-    return rUsers;
+  findAll(): Promise<User[]> {
+    return this.userRepository.find();
   }
 
-  async findOne({ email }: FindByEmailDto): Promise<User> {
+  async findOne({ email }: FindByEmailDto) {
     const user = await this.userRepository
       .createQueryBuilder('user')
       .where('user.email=:email', { email })
@@ -67,7 +53,7 @@ export class UserService {
     return user;
   }
 
-  async findForLogin({ email, password }: LoginUserDto): Promise<IloginData> {
+  async findForLogin({ email, password }: LoginUserDto): Promise<any> {
     const user = await this.userRepository
       .createQueryBuilder('user')
       .where('user.email=:email', { email })
@@ -77,7 +63,7 @@ export class UserService {
         console.log(error.message);
       });
     if (user.password !== password) {
-      throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      return 'error';
     }
     const payload = { id: user.id, name: user.first_name };
     const secret = 'secret word';
@@ -94,30 +80,57 @@ export class UserService {
     return result;
   }
 
-  async findOneById(id: number): Promise<IreturnUser> {
-    const user = await this.userRepository
-      .createQueryBuilder('user')
-      .where('user.id = :id', { id: id })
-      .getOneOrFail()
-      .catch((error) => {
-        console.log('error', error);
-        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
-      });
-    const { password, ...data } = user;
-    return data;
-  }
+  // async findOneById(id: number): Promise<User> {
+  //   return await this.userRepository.findOne({ where: { id } });
+  // }
 
-  async blockUser(dto: BlockUserDto): Promise<IreturnUser> {
+  // async findOneById(id: number): Promise<User> {
+  //   const user = await getRepository(UserRepository)
+  //     .createQueryBuilder('user')
+  //     .where('user.id = :id', { id: id })
+  //     .getOne();
+  // }
+
+  // async updateUser(userId: string, dto: UpdateUserDto): Promise<User> {
+  //   try {
+  //     const id = parseInt(userId);
+  //     const user = await this.userRepository.findOne({
+  //       where: { id },
+  //     });
+  //     if (!user) {
+  //       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+  //     }
+  //     return this.userRepository.update({ where: { id } }, dto);
+  //   } catch (e) {
+  //     console.log(e.message);
+  //   }
+  // }
+
+  async blockUser(dto: BlockUserDto) {
     try {
       const user = await this.userRepository.findOne(dto.id);
       if (!user) {
         throw new HttpException('Not found', HttpStatus.NOT_FOUND);
       }
       user.is_blocked = true;
-      const { password, ...data } = user;
-      return data;
+      return user;
     } catch (e) {
       console.log(e.message);
     }
   }
+
+  // async loginUser(dto: LoginUserDto) {
+  //   const email = dto.email;
+  //   const user = await await this.userRepository.findOne({
+  //     where: { email: email },
+  //     // include: { all: true },
+  //   });
+  //   if (!user) {
+  //     throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+  //   }
+  //   if (user.password === dto.password) {
+  //     return user;
+  //   }
+  //   throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+  // }
 }
