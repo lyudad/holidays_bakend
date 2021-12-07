@@ -3,7 +3,7 @@ import { DaysOff } from './daysOff.entity';
 
 export enum UserRole {
   EMPLOYEE = 'employee',
-  ADMIN = 'hr',
+  ADMIN = 'admin',
   SUPER_ADMIN = 'super_admin',
 }
 
@@ -36,10 +36,7 @@ export class User {
 
   @Column({ type: Date })
   created_at: Date;
-
-  @Column({
-    default: 'null',
-  })
+  @Column()
   token: string;
 
   @OneToMany(() => DaysOff, (daysOff) => daysOff.user)
