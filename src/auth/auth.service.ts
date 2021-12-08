@@ -47,7 +47,6 @@ export class AuthService {
       return;
     }
     const user = await this.userService.findUserList(decoded.userRole);
-    console.log(token);
     return user;
   }
 }

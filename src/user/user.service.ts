@@ -207,7 +207,7 @@ export class UserService {
         return usersAll;
 
       default:
-        return hrUserList;
+        return users;
     }
   }
 }
