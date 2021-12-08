@@ -16,14 +16,13 @@ import {
 const jwt = require('jsonwebtoken');
 
 const bcrypt = require('bcrypt');
-
-import { IreturnUser, IloginData } from './user.types';
+import { IreturnUser } from './user.types';
 
 @Injectable()
 export class UserService {
   constructor(private userRepository: UserRepository) {}
 
-  async create(dto: CreateUserDto): Promise<IreturnUser> {
+  async create(dto: CreateUserDto): Promise<User> {
     try {
       const uuidPass = uuid4().toString().split('-').slice(0, 1);
       const genPassword = uuidPass[0].toString();
@@ -64,7 +63,7 @@ export class UserService {
     return rUsers;
   }
 
-  async findOne({ email }: FindByEmailDto): Promise<User> {
+  async findOne({ email }: FindByEmailDto) {
     const user = await this.userRepository
       .createQueryBuilder('user')
       .where('user.email=:email', { email })
@@ -76,7 +75,20 @@ export class UserService {
     return user;
   }
 
-  async findForLogin({ email, password }: LoginUserDto): Promise<IloginData> {
+  async findOneById(id: number): Promise<IreturnUser> {
+    const user = await this.userRepository
+      .createQueryBuilder('id')
+      .where('user.id=:id', { id })
+      .getOneOrFail()
+      .catch((error) => {
+        console.log('error', error);
+        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      });
+    const { password, ...data } = user;
+    return data;
+  }
+
+  async findForLogin({ email, password }: LoginUserDto): Promise<any> {
     const user = await this.userRepository
       .createQueryBuilder('user')
       .where('user.email=:email', { email })
@@ -86,7 +98,7 @@ export class UserService {
         console.log(error.message);
       });
     if (user.password !== password) {
-      throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      return 'error';
     }
     const payload = { id: user.id, name: user.first_name };
     const secret = 'secret word';
@@ -103,19 +115,6 @@ export class UserService {
     return result;
   }
 
-  async findOneById(id: number): Promise<IreturnUser> {
-    const user = await this.userRepository
-      .createQueryBuilder('user')
-      .where('user.id = :id', { id: id })
-      .getOneOrFail()
-      .catch((error) => {
-        console.log('error', error);
-        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
-      });
-    const { password, ...data } = user;
-    return data;
-  }
-
   async blockUser(dto: BlockUserDto): Promise<IreturnUser> {
     try {
       const user = await this.userRepository.findOne(dto.id);
@@ -123,8 +122,7 @@ export class UserService {
         throw new HttpException('Not found', HttpStatus.NOT_FOUND);
       }
       user.is_blocked = true;
-      const { password, ...data } = user;
-      return data;
+      return user;
     } catch (e) {
       console.log(e.message);
     }

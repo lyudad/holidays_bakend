@@ -27,19 +27,16 @@ import { IreturnUser, IloginData } from './user.types';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @UseGuards(JwtAuthGuard)
   @Post()
   createUser(@Body() dto: CreateUserDto): Promise<IreturnUser> {
     return this.userService.create(dto);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Post('/block')
   blockUser(@Body() dto: BlockUserDto): Promise<IreturnUser> {
     return this.userService.blockUser(dto);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Patch('/:id')
   updateUser(
     @Param('id') id: number,
@@ -47,8 +44,11 @@ export class UserController {
   ): Promise<IreturnUser> {
     return this.userService.updateUser(updateUserDto);
   }
+  @Get('/login')
+  findForLogin(@Body() dto: LoginUserDto) {
+    return this.userService.findForLogin(dto);
+  }
 
-  @UseGuards(JwtAuthGuard)
   @Get()
   findAll(): Promise<IreturnUser[]> {
     return this.userService.findAll();
@@ -58,5 +58,11 @@ export class UserController {
   @Get('/:id')
   findOneById(@Param('id') id: number): Promise<IreturnUser> {
     return this.userService.findOneById(id);
+
+    // findAll() {
+    //   return [
+    //     {firstName: 'Buba',lastName: 'Umpa',email: 'poletslova@gmail.com'},
+    //   ];
+    // }
   }
 }

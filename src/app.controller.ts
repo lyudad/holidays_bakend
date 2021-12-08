@@ -3,7 +3,6 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { LocalAuthGuard } from './auth/local-auth.guard';
 import { AuthService } from './auth/auth.service';
 import { IloginData, IreturnUser } from './user/user.types';
-// import { LoginUserDto } from './user/user.dto';
 
 @Controller()
 export class AppController {
