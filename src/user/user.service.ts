@@ -27,13 +27,13 @@ export class UserService {
     try {
       const uuidPass = uuid4().toString().split('-').slice(0, 1);
       const genPassword = uuidPass[0].toString();
-      // шифруем пароль перед сохранением в базе
-      const pass = bcrypt.hashSync(genPassword, bcrypt.genSaltSync(10));
-      // console.log(password);
-      const newUser = { ...dto, pass };
+      const bcryptPassword = bcrypt.hashSync(
+        genPassword,
+        bcrypt.genSaltSync(10),
+      );
+      const newUser = { ...dto, bcryptPassword };
       const user = await this.userRepository.create(newUser);
       const { password, ...data } = user;
-      console.log(data);
       return user;
     } catch (e) {
       console.log(e.message);
@@ -49,7 +49,16 @@ export class UserService {
         throw new HttpException('Not found', HttpStatus.NOT_FOUND);
       });
     const rUsers = users.map((user) => {
-      const { password, ...data } = user;
+      const data = {
+        id: user.id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        role: user.role,
+        is_blocked: user.is_blocked,
+        created_at: user.created_at,
+        token: ' ',
+      };
       return data;
     });
     return rUsers;
@@ -115,6 +124,35 @@ export class UserService {
       }
       user.is_blocked = true;
       const { password, ...data } = user;
+      return data;
+    } catch (e) {
+      console.log(e.message);
+    }
+  }
+
+  async updateUser(dto: UpdateUserDto): Promise<IreturnUser> {
+    try {
+      const userData = await this.userRepository.findOne(dto.id);
+      if (!userData) {
+        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      }
+      const updateUser = { ...userData, ...dto };
+      const saveUpdateUser = await this.userRepository
+        .createQueryBuilder()
+        .update(User)
+        .set({
+          id: updateUser.id,
+          first_name: updateUser.first_name,
+          last_name: updateUser.last_name,
+          email: updateUser.email,
+          password: updateUser.password,
+          role: updateUser.role,
+          is_blocked: updateUser.is_blocked,
+        })
+        .where('id = :id', { id: dto.id })
+        .execute();
+
+      const { password, ...data } = updateUser;
       return data;
     } catch (e) {
       console.log(e.message);

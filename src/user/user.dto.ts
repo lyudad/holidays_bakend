@@ -84,7 +84,7 @@ export class LoginUserDto {
 
 export class UpdateUserDto {
   @IsNotEmpty()
-  id: string;
+  id: number;
 
   @IsString()
   first_name: string;

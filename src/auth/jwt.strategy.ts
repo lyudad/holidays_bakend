@@ -8,6 +8,12 @@ interface Ipayload {
   username: string;
   userRole: string;
 }
+
+interface IValidate {
+  userId: number;
+  username: string;
+  role: string;
+}
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
@@ -18,7 +24,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: Ipayload) {
+  async validate(payload: Ipayload): Promise<IValidate> {
     return {
       userId: payload.sub,
       username: payload.username,
