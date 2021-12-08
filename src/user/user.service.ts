@@ -12,11 +12,11 @@ import {
   LoginUserDto,
   BlockUserDto,
 } from './user.dto';
+import { IreturnUser } from './user.types';
 
 const jwt = require('jsonwebtoken');
 
 const bcrypt = require('bcrypt');
-import { IreturnUser } from './user.types';
 
 @Injectable()
 export class UserService {

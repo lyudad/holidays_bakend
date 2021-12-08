@@ -40,13 +40,13 @@ export class AuthService {
       is_blocked: user.is_blocked,
     };
   }
-  async getUserList(token: string): Promise<any> {
+  async getUserList(token: string): Promise<IreturnUser[]> {
     const decoded = this.jwtService.verify(token);
 
     if (decoded.userRole === 'employee') {
       return;
     }
-    const user = await this.userService.findUserList(decoded.userRole);
-    return user;
+    const users = await this.userService.findUserList(decoded.userRole);
+    return users;
   }
 }
