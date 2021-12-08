@@ -156,7 +156,7 @@ export class UserService {
       console.log(e.message);
     }
   }
-  async findUserList(role): Promise<User[]> {
+  async findUserList(role): Promise<IreturnUser[]> {
     switch (role) {
       case 'hr':
         const hrUserList = await this.userRepository
@@ -167,7 +167,20 @@ export class UserService {
             console.log('error', error);
             throw new HttpException('Not found', HttpStatus.NOT_FOUND);
           });
-        return hrUserList;
+        const users = hrUserList.map((user) => {
+          const data = {
+            id: user.id,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            email: user.email,
+            role: user.role,
+            is_blocked: user.is_blocked,
+            created_at: user.created_at,
+            token: ' ',
+          };
+          return data;
+        });
+        return users;
 
       case 'super_admin':
         const adminUserList = await this.userRepository
@@ -178,7 +191,20 @@ export class UserService {
             console.log('error', error);
             throw new HttpException('Not found', HttpStatus.NOT_FOUND);
           });
-        return adminUserList;
+        const usersAll = adminUserList.map((user) => {
+          const data = {
+            id: user.id,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            email: user.email,
+            role: user.role,
+            is_blocked: user.is_blocked,
+            created_at: user.created_at,
+            token: ' ',
+          };
+          return data;
+        });
+        return usersAll;
 
       default:
         return hrUserList;

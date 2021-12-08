@@ -21,7 +21,7 @@ export class AppController {
   }
   @UseGuards(LocalAuthGuard)
   @Post('auth/list')
-  async getUserList(@Request() req) {
+  async getUserList(@Request() req): Promise<IreturnUser[]> {
     return this.authService.getUserList(req.body.token);
   }
 }
