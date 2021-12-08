@@ -2,8 +2,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 import { User } from '../entities/user.entity';
 
-const { DB_PORT, DB_HOST, DB_USERNAME, DB_PASSWORD, DATABASE, NODE_ENV } =
-  process.env;
+const { DB_PORT, DB_HOST, DB_USERNAME, DB_PASSWORD, DB_DATABASE } = process.env;
 console.log(DB_USERNAME);
 
 export default () => ({
@@ -14,7 +13,7 @@ export default () => ({
     port: Number(DB_PORT),
     username: DB_USERNAME,
     password: DB_PASSWORD,
-    database: DATABASE,
+    database: DB_DATABASE,
     entities: [User],
     synchronize: true,
     // synchronize: NODE_ENV === 'production' ? false : true,

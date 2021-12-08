@@ -16,6 +16,7 @@ import {
 const jwt = require('jsonwebtoken');
 
 const bcrypt = require('bcrypt');
+import { IreturnUser } from './user.types';
 
 @Injectable()
 export class UserService {
@@ -25,20 +26,41 @@ export class UserService {
     try {
       const uuidPass = uuid4().toString().split('-').slice(0, 1);
       const genPassword = uuidPass[0].toString();
-      // шифруем пароль передсохранением в базе
-      const password = bcrypt.hashSync(genPassword, bcrypt.genSaltSync(10));
-      // console.log(password);
-      const newUser = { ...dto, genPassword };
+      const bcryptPassword = bcrypt.hashSync(
+        genPassword,
+        bcrypt.genSaltSync(10),
+      );
+      const newUser = { ...dto, bcryptPassword };
       const user = await this.userRepository.create(newUser);
-      console.log(user);
+      const { password, ...data } = user;
       return user;
     } catch (e) {
       console.log(e.message);
     }
   }
 
-  findAll(): Promise<User[]> {
-    return this.userRepository.find();
+  async findAll(): Promise<IreturnUser[]> {
+    const users = await this.userRepository
+      .createQueryBuilder('user')
+      .getMany()
+      .catch((error) => {
+        console.log(error.message);
+        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      });
+    const rUsers = users.map((user) => {
+      const data = {
+        id: user.id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        role: user.role,
+        is_blocked: user.is_blocked,
+        created_at: user.created_at,
+        token: ' ',
+      };
+      return data;
+    });
+    return rUsers;
   }
 
   async findOne({ email }: FindByEmailDto) {
@@ -51,6 +73,19 @@ export class UserService {
         throw new HttpException('Not found', HttpStatus.NOT_FOUND);
       });
     return user;
+  }
+
+  async findOneById(id: number): Promise<IreturnUser> {
+    const user = await this.userRepository
+      .createQueryBuilder('id')
+      .where('user.id=:id', { id })
+      .getOneOrFail()
+      .catch((error) => {
+        console.log('error', error);
+        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      });
+    const { password, ...data } = user;
+    return data;
   }
 
   async findForLogin({ email, password }: LoginUserDto): Promise<any> {
@@ -80,33 +115,7 @@ export class UserService {
     return result;
   }
 
-  // async findOneById(id: number): Promise<User> {
-  //   return await this.userRepository.findOne({ where: { id } });
-  // }
-
-  // async findOneById(id: number): Promise<User> {
-  //   const user = await getRepository(UserRepository)
-  //     .createQueryBuilder('user')
-  //     .where('user.id = :id', { id: id })
-  //     .getOne();
-  // }
-
-  // async updateUser(userId: string, dto: UpdateUserDto): Promise<User> {
-  //   try {
-  //     const id = parseInt(userId);
-  //     const user = await this.userRepository.findOne({
-  //       where: { id },
-  //     });
-  //     if (!user) {
-  //       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
-  //     }
-  //     return this.userRepository.update({ where: { id } }, dto);
-  //   } catch (e) {
-  //     console.log(e.message);
-  //   }
-  // }
-
-  async blockUser(dto: BlockUserDto) {
+  async blockUser(dto: BlockUserDto): Promise<IreturnUser> {
     try {
       const user = await this.userRepository.findOne(dto.id);
       if (!user) {
@@ -119,18 +128,32 @@ export class UserService {
     }
   }
 
-  // async loginUser(dto: LoginUserDto) {
-  //   const email = dto.email;
-  //   const user = await await this.userRepository.findOne({
-  //     where: { email: email },
-  //     // include: { all: true },
-  //   });
-  //   if (!user) {
-  //     throw new HttpException('Not found', HttpStatus.NOT_FOUND);
-  //   }
-  //   if (user.password === dto.password) {
-  //     return user;
-  //   }
-  //   throw new HttpException('Not found', HttpStatus.NOT_FOUND);
-  // }
+  async updateUser(dto: UpdateUserDto): Promise<IreturnUser> {
+    try {
+      const userData = await this.userRepository.findOne(dto.id);
+      if (!userData) {
+        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      }
+      const updateUser = { ...userData, ...dto };
+      const saveUpdateUser = await this.userRepository
+        .createQueryBuilder()
+        .update(User)
+        .set({
+          id: updateUser.id,
+          first_name: updateUser.first_name,
+          last_name: updateUser.last_name,
+          email: updateUser.email,
+          password: updateUser.password,
+          role: updateUser.role,
+          is_blocked: updateUser.is_blocked,
+        })
+        .where('id = :id', { id: dto.id })
+        .execute();
+
+      const { password, ...data } = updateUser;
+      return data;
+    } catch (e) {
+      console.log(e.message);
+    }
+  }
 }
