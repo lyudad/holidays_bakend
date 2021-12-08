@@ -156,4 +156,32 @@ export class UserService {
       console.log(e.message);
     }
   }
+  async findUserList(role): Promise<User[]> {
+    switch (role) {
+      case 'hr':
+        const hrUserList = await this.userRepository
+          .createQueryBuilder('user')
+          .where('user.role=:role', { role: 'employee' })
+          .getMany()
+          .catch((error) => {
+            console.log('error', error);
+            throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+          });
+        return hrUserList;
+
+      case 'super_admin':
+        const adminUserList = await this.userRepository
+          .createQueryBuilder('user')
+          .where('user.role IN (:...roles)', { roles: ['employee', 'hr'] })
+          .getMany()
+          .catch((error) => {
+            console.log('error', error);
+            throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+          });
+        return adminUserList;
+
+      default:
+        return hrUserList;
+    }
+  }
 }

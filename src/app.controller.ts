@@ -19,4 +19,9 @@ export class AppController {
   async getProfile(@Request() req): Promise<IreturnUser> {
     return req.user;
   }
+  @UseGuards(LocalAuthGuard)
+  @Post('auth/list')
+  async getUserList(@Request() req) {
+    return this.authService.getUserList(req.body.token);
+  }
 }
