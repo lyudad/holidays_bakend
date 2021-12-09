@@ -2,7 +2,7 @@ import { Injectable, HttpStatus, HttpException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { IreturnUser, IloginData } from '../user/user.types';
-import { User } from '../entities/user.entity';
+import { User, UserRole } from '../entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -43,10 +43,11 @@ export class AuthService {
   async getUserList(token: string): Promise<IreturnUser[]> {
     const decoded = this.jwtService.verify(token);
 
-    if (decoded.userRole === 'employee') {
+    if (decoded.userRole === UserRole.EMPLOYEE) {
       return;
     }
     const users = await this.userService.findUserList(decoded.userRole);
+
     return users;
   }
 }

@@ -21,7 +21,7 @@ import {
 } from './user.dto';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { IreturnUser, IloginData } from './user.types';
+import { IreturnUser} from './user.types';
 
 @Controller('/user')
 export class UserController {

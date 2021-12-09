@@ -4,7 +4,7 @@ import { Repository, Connection } from 'typeorm';
 import { v4 as uuid4 } from 'uuid';
 import { EntityRepository } from 'typeorm';
 import { UserRepository } from './user.repository';
-import { User } from 'src/entities/user.entity';
+import { User, UserRole } from 'src/entities/user.entity';
 import {
   CreateUserDto,
   FindByEmailDto,
@@ -158,56 +158,49 @@ export class UserService {
   }
   async findUserList(role): Promise<IreturnUser[]> {
     switch (role) {
-      case 'hr':
+      case UserRole.ADMIN:
         const hrUserList = await this.userRepository
           .createQueryBuilder('user')
-          .where('user.role=:role', { role: 'employee' })
-          .getMany()
+          .where('user.role=:role', { role: UserRole.EMPLOYEE })
+          .select('user.id')
+          .addSelect('first_name')
+          .addSelect('last_name')
+          .addSelect('email')
+          .addSelect('role')
+          .addSelect('is_blocked')
+          .addSelect('created_at')
+          .addSelect('token')
+          .getRawMany()
           .catch((error) => {
             console.log('error', error);
             throw new HttpException('Not found', HttpStatus.NOT_FOUND);
           });
-        const users = hrUserList.map((user) => {
-          const data = {
-            id: user.id,
-            first_name: user.first_name,
-            last_name: user.last_name,
-            email: user.email,
-            role: user.role,
-            is_blocked: user.is_blocked,
-            created_at: user.created_at,
-            token: ' ',
-          };
-          return data;
-        });
-        return users;
+        return hrUserList;
 
-      case 'super_admin':
+      case UserRole.SUPER_ADMIN:
         const adminUserList = await this.userRepository
           .createQueryBuilder('user')
-          .where('user.role IN (:...roles)', { roles: ['employee', 'hr'] })
-          .getMany()
+          .where('user.role IN (:...roles)', {
+            roles: [UserRole.EMPLOYEE, UserRole.ADMIN],
+          })
+          .select('user.id')
+          .addSelect('first_name')
+          .addSelect('last_name')
+          .addSelect('email')
+          .addSelect('role')
+          .addSelect('is_blocked')
+          .addSelect('created_at')
+          .addSelect('token')
+          .getRawMany()
           .catch((error) => {
             console.log('error', error);
             throw new HttpException('Not found', HttpStatus.NOT_FOUND);
           });
-        const usersAll = adminUserList.map((user) => {
-          const data = {
-            id: user.id,
-            first_name: user.first_name,
-            last_name: user.last_name,
-            email: user.email,
-            role: user.role,
-            is_blocked: user.is_blocked,
-            created_at: user.created_at,
-            token: ' ',
-          };
-          return data;
-        });
-        return usersAll;
+
+        return adminUserList;
 
       default:
-        return users;
+        return hrUserList;
     }
   }
 }
