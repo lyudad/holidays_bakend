@@ -12,7 +12,7 @@ import {
   LoginUserDto,
   BlockUserDto,
 } from './user.dto';
-import { IreturnUser } from './user.types';
+import { IreturnUser, IreturnUserList } from './user.types';
 
 const jwt = require('jsonwebtoken');
 
@@ -156,7 +156,7 @@ export class UserService {
       console.log(e.message);
     }
   }
-  async findUserList(role): Promise<IreturnUser[]> {
+  async findUserList(role: string): Promise<IreturnUserList[]> {
     switch (role) {
       case UserRole.ADMIN:
         const hrUserList = await this.userRepository
@@ -165,11 +165,7 @@ export class UserService {
           .select('user.id')
           .addSelect('first_name')
           .addSelect('last_name')
-          .addSelect('email')
-          .addSelect('role')
           .addSelect('is_blocked')
-          .addSelect('created_at')
-          .addSelect('token')
           .getRawMany()
           .catch((error) => {
             console.log('error', error);
@@ -186,11 +182,7 @@ export class UserService {
           .select('user.id')
           .addSelect('first_name')
           .addSelect('last_name')
-          .addSelect('email')
-          .addSelect('role')
           .addSelect('is_blocked')
-          .addSelect('created_at')
-          .addSelect('token')
           .getRawMany()
           .catch((error) => {
             console.log('error', error);
