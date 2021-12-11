@@ -21,14 +21,14 @@ import {
 } from './user.dto';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { IreturnUser, IloginData } from './user.types';
+import { IreturnUser, IloginData, ICreateUser } from './user.types';
 
-@Controller('/user')
+@Controller('/user/create')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  createUser(@Body() dto: CreateUserDto): Promise<IreturnUser> {
+  createUser(@Body() dto: CreateUserDto): Promise<void> {
     return this.userService.create(dto);
   }
 

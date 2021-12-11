@@ -1,8 +1,8 @@
 import { HttpStatus, HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Connection } from 'typeorm';
-import { v4 as uuid4 } from 'uuid';
-import { EntityRepository } from 'typeorm';
+// import { Repository, Connection } from 'typeorm';
+import ShortUniqueId from 'short-unique-id';
+// import { EntityRepository } from 'typeorm';
 import { UserRepository } from './user.repository';
 import { User } from 'src/entities/user.entity';
 import {
@@ -12,31 +12,48 @@ import {
   LoginUserDto,
   BlockUserDto,
 } from './user.dto';
-
 const jwt = require('jsonwebtoken');
-
 const bcrypt = require('bcrypt');
-import { IreturnUser } from './user.types';
+import { IreturnUser, ICreateUser } from './user.types';
 
 @Injectable()
 export class UserService {
   constructor(private userRepository: UserRepository) {}
 
-  async create(dto: CreateUserDto): Promise<User> {
-    try {
-      const uuidPass = uuid4().toString().split('-').slice(0, 1);
-      const genPassword = uuidPass[0].toString();
+  async checkUser(email: string) {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.email=:email', { email })
+      .getOne()
+      .catch((error) => {
+        console.log('error', error);
+      });
+    return user;
+  }
+
+  async create(dto: CreateUserDto): Promise<void> {
+    const user = await this.checkUser(dto.email);
+    if (!user) {
+      const uid = new ShortUniqueId();
+      const genPassword = uid.stamp(10);
       const bcryptPassword = bcrypt.hashSync(
         genPassword,
         bcrypt.genSaltSync(10),
       );
-      const newUser = { ...dto, bcryptPassword };
-      const user = await this.userRepository.create(newUser);
-      const { password, ...data } = user;
-      return user;
-    } catch (e) {
-      console.log(e.message);
+      const newUser = this.userRepository.create({
+        first_name: dto.first_name,
+        last_name: dto.last_name,
+        email: dto.email,
+        password: genPassword,
+        role: dto.role,
+        is_blocked: dto.is_blocked,
+      });
+      await this.userRepository.save(newUser).catch((err) => {
+        throw new HttpException('Unknown Error ', HttpStatus.BAD_REQUEST);
+      });
+      throw new HttpException('Created ', HttpStatus.CREATED);
     }
+    throw new HttpException('Conflict', HttpStatus.CONFLICT);
   }
 
   async findAll(): Promise<IreturnUser[]> {
@@ -78,7 +95,7 @@ export class UserService {
   async findOneById(id: number): Promise<IreturnUser> {
     const user = await this.userRepository
       .createQueryBuilder('id')
-      .where('user.id=:id', { id })
+      .where('id=:id', { id })
       .getOneOrFail()
       .catch((error) => {
         console.log('error', error);

@@ -63,8 +63,8 @@ export class CreateUserDto {
   @IsBoolean()
   readonly is_blocked: boolean;
 
-  @IsDate()
-  readonly created_at: Date;
+  // @IsDate()
+  // readonly created_at: Date;
 }
 
 export class FindByEmailDto {

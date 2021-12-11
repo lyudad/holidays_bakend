@@ -16,3 +16,12 @@ export interface IloginData {
   role: string;
   is_blocked: boolean;
 }
+
+export interface ICreateUser {
+  first_name: string;
+  last_name: string;
+  email: string;
+  password: string;
+  role: string;
+  is_blocked: boolean;
+}
