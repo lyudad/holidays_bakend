@@ -21,7 +21,7 @@ export class AppController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('auth/list')
+  @Post('users/list')
   async getUserList(@Request() req): Promise<IreturnUserList[]> {
     return this.authService.getUserList(req.body.token);
   }
