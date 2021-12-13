@@ -1,8 +1,6 @@
 import { HttpStatus, HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-// import { Repository, Connection } from 'typeorm';
 import ShortUniqueId from 'short-unique-id';
-// import { EntityRepository } from 'typeorm';
 import { UserRepository } from './user.repository';
 import { User } from 'src/entities/user.entity';
 import {
@@ -12,13 +10,24 @@ import {
   LoginUserDto,
   BlockUserDto,
 } from './user.dto';
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+import * as jwt from 'jsonwebtoken';
+import * as bcrypt from 'bcrypt';
 import { IreturnUser, ICreateUser } from './user.types';
+import { MailService } from '../mail/mail.service';
+
+interface IUserMail {
+  first_name: string;
+  last_name: string;
+  email: string;
+  password: string;
+}
 
 @Injectable()
 export class UserService {
-  constructor(private userRepository: UserRepository) {}
+  constructor(
+    private userRepository: UserRepository,
+    private readonly mailService: MailService,
+  ) {}
 
   async checkUser(email: string) {
     const user = await this.userRepository
@@ -36,15 +45,22 @@ export class UserService {
     if (!user) {
       const uid = new ShortUniqueId();
       const genPassword = uid.stamp(10);
-      const bcryptPassword = bcrypt.hashSync(
-        genPassword,
-        bcrypt.genSaltSync(10),
-      );
-      const newUser = this.userRepository.create({
+      const saltOrRounds = 10;
+      const hash = bcrypt.hashSync(genPassword, saltOrRounds);
+      const userToMail: IUserMail = {
         first_name: dto.first_name,
         last_name: dto.last_name,
         email: dto.email,
         password: genPassword,
+      };
+
+      await this.mailService.sendPassword(userToMail);
+
+      const newUser = this.userRepository.create({
+        first_name: dto.first_name,
+        last_name: dto.last_name,
+        email: dto.email,
+        password: hash,
         role: dto.role,
         is_blocked: dto.is_blocked,
       });
@@ -114,22 +130,25 @@ export class UserService {
         throw new HttpException('Not found', HttpStatus.NOT_FOUND);
         console.log(error.message);
       });
-    if (user.password !== password) {
-      return 'error';
+    const { password: hash } = user;
+    const isMatch: boolean = await bcrypt.compare(password, hash);
+    if (isMatch) {
+      const payload = { id: user.id, name: user.first_name };
+      const secret = 'secret word';
+      const token = jwt.sign(payload, secret);
+      const result = {
+        id: user.id,
+        first_name: user.first_name,
+        role: user.role,
+        is_blocked: user.is_blocked,
+        token,
+      };
+      return result;
     }
-    const payload = { id: user.id, name: user.first_name };
-    const secret = 'secret word';
-    const token = jwt.sign(payload, secret);
-    const result = {
-      id: user.id,
-      first_name: user.first_name,
-      role: user.role,
-      is_blocked: user.is_blocked,
-      token,
-    };
-
-    console.log(result);
-    return result;
+    throw new HttpException(
+      'password or login do not match',
+      HttpStatus.UNAUTHORIZED,
+    );
   }
 
   async blockUser(dto: BlockUserDto): Promise<IreturnUser> {

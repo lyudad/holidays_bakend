@@ -23,11 +23,11 @@ import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { IreturnUser, IloginData, ICreateUser } from './user.types';
 
-@Controller('/user/create')
+@Controller('/user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
+  @Post('/create')
   createUser(@Body() dto: CreateUserDto): Promise<void> {
     return this.userService.create(dto);
   }
@@ -44,7 +44,7 @@ export class UserController {
   ): Promise<IreturnUser> {
     return this.userService.updateUser(updateUserDto);
   }
-  @Get('/login')
+  @Post('/login')
   findForLogin(@Body() dto: LoginUserDto) {
     return this.userService.findForLogin(dto);
   }

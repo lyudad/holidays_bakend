@@ -42,26 +42,26 @@ export class User {
   @CreateDateColumn({ type: Date })
   created_at: Date;
 
-  @Column({ default: ' ' })
+  @Column({ default: '' })
   token: string;
 
   @OneToMany(() => DaysOff, (daysOff) => daysOff.user)
   daysOff: DaysOff[];
 }
 
-@Entity()
-export class UserMail {
-  @PrimaryGeneratedColumn()
-  id: string;
+// @Entity()
+// export class UserMail {
+//   @PrimaryGeneratedColumn()
+//   id: string;
 
-  @Column()
-  first_name: string;
+//   @Column()
+//   first_name: string;
 
-  @Column()
-  last_name: string;
+//   @Column()
+//   last_name: string;
 
-  @Column()
-  email: string;
-  @Column()
-  password: string;
-}
+//   @Column()
+//   email: string;
+//   @Column()
+//   password: string;
+// }

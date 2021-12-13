@@ -11,7 +11,7 @@ export class MailService {
       from: 'zenbit_holidays@meta.ua',
       subject: 'Welcome to Holidays!',
       text: 'Use this password',
-      html: `<b>Hello, ${user.firstName}, your new password: ${user.password}</b>`,
+      html: `<b>Hello, ${user.first_name}, your new password: ${user.password}</b>`,
     });
   }
 }
