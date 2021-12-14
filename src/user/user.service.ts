@@ -157,42 +157,28 @@ export class UserService {
     }
   }
   async findUserList(role: string): Promise<IreturnUserList[]> {
-    switch (role) {
-      case UserRole.ADMIN:
-        const hrUserList = await this.userRepository
-          .createQueryBuilder('user')
-          .where('user.role=:role', { role: UserRole.EMPLOYEE })
-          .select('user.id')
-          .addSelect('first_name')
-          .addSelect('last_name')
-          .addSelect('is_blocked')
-          .getRawMany()
-          .catch((error) => {
-            console.log('error', error);
-            throw new HttpException('Not found', HttpStatus.NOT_FOUND);
-          });
-        return hrUserList;
+    const returnList = () => {
+      if (role === UserRole.SUPER_ADMIN) {
+        return [UserRole.EMPLOYEE, UserRole.ADMIN];
+      } else if (role === UserRole.ADMIN) {
+        return [UserRole.EMPLOYEE];
+      }
+    };
 
-      case UserRole.SUPER_ADMIN:
-        const adminUserList = await this.userRepository
-          .createQueryBuilder('user')
-          .where('user.role IN (:...roles)', {
-            roles: [UserRole.EMPLOYEE, UserRole.ADMIN],
-          })
-          .select('user.id')
-          .addSelect('first_name')
-          .addSelect('last_name')
-          .addSelect('is_blocked')
-          .getRawMany()
-          .catch((error) => {
-            console.log('error', error);
-            throw new HttpException('Not found', HttpStatus.NOT_FOUND);
-          });
-
-        return adminUserList;
-
-      default:
-        return hrUserList;
-    }
+    const adminUserList = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.role IN (:...roles)', {
+        roles: returnList(),
+      })
+      .select('user.id')
+      .addSelect('first_name')
+      .addSelect('last_name')
+      .addSelect('is_blocked')
+      .getRawMany()
+      .catch((error) => {
+        console.log('error', error);
+        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      });
+    return adminUserList;
   }
 }
