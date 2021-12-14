@@ -10,8 +10,6 @@ import {
   Patch,
   UseGuards,
 } from '@nestjs/common';
-// import { User } from '../entities/user.entity';
-// import { UpdateResult } from 'typeorm';
 import { CreateUserDto, UpdateUserDto, BlockUserDto } from './user.dto';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
