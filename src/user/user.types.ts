@@ -16,3 +16,10 @@ export interface IloginData {
   role: string;
   is_blocked: boolean;
 }
+
+export interface IreturnUserList {
+  id: number;
+  first_name: string;
+  last_name: string;
+  is_blocked: boolean;
+}

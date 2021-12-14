@@ -4,7 +4,7 @@ import { Repository, Connection } from 'typeorm';
 import { v4 as uuid4 } from 'uuid';
 import { EntityRepository } from 'typeorm';
 import { UserRepository } from './user.repository';
-import { User } from 'src/entities/user.entity';
+import { User, UserRole } from 'src/entities/user.entity';
 import {
   CreateUserDto,
   FindByEmailDto,
@@ -12,11 +12,11 @@ import {
   LoginUserDto,
   BlockUserDto,
 } from './user.dto';
+import { IreturnUser, IreturnUserList } from './user.types';
 
 const jwt = require('jsonwebtoken');
 
 const bcrypt = require('bcrypt');
-import { IreturnUser } from './user.types';
 
 @Injectable()
 export class UserService {
@@ -155,5 +155,30 @@ export class UserService {
     } catch (e) {
       console.log(e.message);
     }
+  }
+  async findUserList(role: string): Promise<IreturnUserList[]> {
+    const returnList = () => {
+      if (role === UserRole.SUPER_ADMIN) {
+        return [UserRole.EMPLOYEE, UserRole.ADMIN];
+      } else if (role === UserRole.ADMIN) {
+        return [UserRole.EMPLOYEE];
+      }
+    };
+
+    const adminUserList = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.role IN (:...roles)', {
+        roles: returnList(),
+      })
+      .select('user.id')
+      .addSelect('first_name')
+      .addSelect('last_name')
+      .addSelect('is_blocked')
+      .getRawMany()
+      .catch((error) => {
+        console.log('error', error);
+        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      });
+    return adminUserList;
   }
 }

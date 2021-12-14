@@ -1,8 +1,8 @@
 import { Injectable, HttpStatus, HttpException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
-import { IreturnUser, IloginData } from '../user/user.types';
-import { User } from '../entities/user.entity';
+import { IreturnUser, IloginData, IreturnUserList } from '../user/user.types';
+import { User, UserRole } from '../entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -39,5 +39,15 @@ export class AuthService {
       role: user.role,
       is_blocked: user.is_blocked,
     };
+  }
+  async getUserList(token: string): Promise<IreturnUserList[]> {
+    const decoded = this.jwtService.verify(token);
+
+    if (decoded.userRole === UserRole.EMPLOYEE) {
+      return;
+    }
+    const users = await this.userService.findUserList(decoded.userRole);
+
+    return users;
   }
 }

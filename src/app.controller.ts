@@ -2,7 +2,7 @@ import { Controller, Get, Request, Post, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { LocalAuthGuard } from './auth/local-auth.guard';
 import { AuthService } from './auth/auth.service';
-import { IloginData, IreturnUser } from './user/user.types';
+import { IloginData, IreturnUser, IreturnUserList } from './user/user.types';
 
 @Controller()
 export class AppController {
@@ -14,9 +14,15 @@ export class AppController {
     return this.authService.login(req.user);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(LocalAuthGuard)
   @Get('profile')
   async getProfile(@Request() req): Promise<IreturnUser> {
     return req.user;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('users/list')
+  async getUserList(@Request() req): Promise<IreturnUserList[]> {
+    return this.authService.getUserList(req.body.token);
   }
 }
