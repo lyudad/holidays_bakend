@@ -8,7 +8,7 @@ import {
 import { DaysOff } from './daysOff.entity';
 export enum UserRole {
   EMPLOYEE = 'employee',
-  HR = 'hr',
+  ADMIN = 'hr',
   SUPER_ADMIN = 'super_admin',
 }
 
