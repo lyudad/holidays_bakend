@@ -1,6 +1,8 @@
 import { Injectable, HttpStatus, HttpException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
+import * as jwt from 'jsonwebtoken';
+import * as bcrypt from 'bcrypt';
 import { IreturnUser, IloginData, IreturnUserList } from '../user/user.types';
 import { User, UserRole } from '../entities/user.entity';
 
@@ -13,7 +15,7 @@ export class AuthService {
 
   async validateUser(email: string, pass: string): Promise<IreturnUser> {
     const user = await this.userService.findOne({ email });
-    if (user && user.password === pass) {
+    if (user && (await bcrypt.compare(pass, user.password))) {
       const { password, ...result } = user;
       return result;
     }

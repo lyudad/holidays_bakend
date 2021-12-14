@@ -25,5 +25,6 @@ import { CreatePassService } from './userPass.service';
   ],
   controllers: [MailController],
   providers: [CreatePassService, MailService],
+  exports: [MailService],
 })
 export class EmailModule {}

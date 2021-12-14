@@ -14,8 +14,4 @@ export class DaysOffService {
     const reservation = await this.daysOffRepository.create(dto);
     return reservation;
   }
-
-  // async update(dto: CreateDaysOffDto) {
-
-  // }
 }
