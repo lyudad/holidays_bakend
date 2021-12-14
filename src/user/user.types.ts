@@ -25,3 +25,10 @@ export interface ICreateUser {
   role: string;
   is_blocked: boolean;
 }
+
+export interface IUserMail {
+  first_name: string;
+  last_name: string;
+  email: string;
+  password: string;
+}

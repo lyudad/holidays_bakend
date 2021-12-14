@@ -12,15 +12,9 @@ import {
 } from './user.dto';
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
-import { IreturnUser, ICreateUser } from './user.types';
+import { IreturnUser } from './user.types';
 import { MailService } from '../mail/mail.service';
-
-interface IUserMail {
-  first_name: string;
-  last_name: string;
-  email: string;
-  password: string;
-}
+import { IUserMail } from './user.types';
 
 @Injectable()
 export class UserService {
@@ -40,7 +34,7 @@ export class UserService {
     return user;
   }
 
-  async create(dto: CreateUserDto): Promise<void> {
+  async createUser(dto: CreateUserDto): Promise<void> {
     const user = await this.checkUser(dto.email);
     if (!user) {
       const uid = new ShortUniqueId();
