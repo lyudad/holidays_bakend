@@ -2,7 +2,7 @@ import { HttpStatus, HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import ShortUniqueId from 'short-unique-id';
 import { UserRepository } from './user.repository';
-import { User } from 'src/entities/user.entity';
+import { User, UserRole } from 'src/entities/user.entity';
 import {
   CreateUserDto,
   FindByEmailDto,
@@ -12,7 +12,7 @@ import {
 } from './user.dto';
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
-import { IreturnUser } from './user.types';
+import { IreturnUser, IreturnUserList } from './user.types';
 import { MailService } from '../mail/mail.service';
 import { IUserMail } from './user.types';
 
@@ -115,36 +115,6 @@ export class UserService {
     return data;
   }
 
-  async findForLogin({ email, password }: LoginUserDto): Promise<any> {
-    const user = await this.userRepository
-      .createQueryBuilder('user')
-      .where('user.email=:email', { email })
-      .getOneOrFail()
-      .catch((error) => {
-        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
-        console.log(error.message);
-      });
-    const { password: hash } = user;
-    const isMatch: boolean = await bcrypt.compare(password, hash);
-    if (isMatch) {
-      const payload = { id: user.id, name: user.first_name };
-      const secret = 'secret word';
-      const token = jwt.sign(payload, secret);
-      const result = {
-        id: user.id,
-        first_name: user.first_name,
-        role: user.role,
-        is_blocked: user.is_blocked,
-        token,
-      };
-      return result;
-    }
-    throw new HttpException(
-      'password or login do not match',
-      HttpStatus.UNAUTHORIZED,
-    );
-  }
-
   async blockUser(dto: BlockUserDto): Promise<IreturnUser> {
     try {
       const user = await this.userRepository.findOne(dto.id);
@@ -185,5 +155,30 @@ export class UserService {
     } catch (e) {
       console.log(e.message);
     }
+  }
+  async findUserList(role: string): Promise<IreturnUserList[]> {
+    const returnList = () => {
+      if (role === UserRole.SUPER_ADMIN) {
+        return [UserRole.EMPLOYEE, UserRole.ADMIN];
+      } else if (role === UserRole.ADMIN) {
+        return [UserRole.EMPLOYEE];
+      }
+    };
+
+    const adminUserList = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.role IN (:...roles)', {
+        roles: returnList(),
+      })
+      .select('user.id')
+      .addSelect('first_name')
+      .addSelect('last_name')
+      .addSelect('is_blocked')
+      .getRawMany()
+      .catch((error) => {
+        console.log('error', error);
+        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      });
+    return adminUserList;
   }
 }
