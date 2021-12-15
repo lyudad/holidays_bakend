@@ -16,6 +16,5 @@ export default () => ({
     database: DB_DATABASE,
     entities: [User],
     synchronize: true,
-    // synchronize: NODE_ENV === 'production' ? false : true,
   },
 });

@@ -1,10 +1,8 @@
 import { HttpStatus, HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Connection } from 'typeorm';
-import { v4 as uuid4 } from 'uuid';
-import { EntityRepository } from 'typeorm';
+import ShortUniqueId from 'short-unique-id';
 import { UserRepository } from './user.repository';
-import { User } from 'src/entities/user.entity';
+import { User, UserRole } from 'src/entities/user.entity';
 import {
   CreateUserDto,
   FindByEmailDto,
@@ -12,31 +10,60 @@ import {
   LoginUserDto,
   BlockUserDto,
 } from './user.dto';
-
-const jwt = require('jsonwebtoken');
-
-const bcrypt = require('bcrypt');
-import { IreturnUser } from './user.types';
+import * as jwt from 'jsonwebtoken';
+import * as bcrypt from 'bcrypt';
+import { IreturnUser, IreturnUserList } from './user.types';
+import { MailService } from '../mail/mail.service';
+import { IUserMail } from './user.types';
 
 @Injectable()
 export class UserService {
-  constructor(private userRepository: UserRepository) {}
+  constructor(
+    private userRepository: UserRepository,
+    private readonly mailService: MailService,
+  ) {}
 
-  async create(dto: CreateUserDto): Promise<User> {
-    try {
-      const uuidPass = uuid4().toString().split('-').slice(0, 1);
-      const genPassword = uuidPass[0].toString();
-      const bcryptPassword = bcrypt.hashSync(
-        genPassword,
-        bcrypt.genSaltSync(10),
-      );
-      const newUser = { ...dto, bcryptPassword };
-      const user = await this.userRepository.create(newUser);
-      const { password, ...data } = user;
-      return user;
-    } catch (e) {
-      console.log(e.message);
+  async checkUser(email: string) {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.email=:email', { email })
+      .getOne()
+      .catch((error) => {
+        console.log('error', error);
+      });
+    return user;
+  }
+
+  async createUser(dto: CreateUserDto): Promise<void> {
+    const user = await this.checkUser(dto.email);
+    if (!user) {
+      const uid = new ShortUniqueId();
+      const genPassword = uid.stamp(10);
+      const saltOrRounds = 10;
+      const hash = bcrypt.hashSync(genPassword, saltOrRounds);
+      const userToMail: IUserMail = {
+        first_name: dto.first_name,
+        last_name: dto.last_name,
+        email: dto.email,
+        password: genPassword,
+      };
+
+      await this.mailService.sendPassword(userToMail);
+
+      const newUser = this.userRepository.create({
+        first_name: dto.first_name,
+        last_name: dto.last_name,
+        email: dto.email,
+        password: hash,
+        role: dto.role,
+        is_blocked: dto.is_blocked,
+      });
+      await this.userRepository.save(newUser).catch((err) => {
+        throw new HttpException('Unknown Error ', HttpStatus.BAD_REQUEST);
+      });
+      throw new HttpException('Created ', HttpStatus.CREATED);
     }
+    throw new HttpException('Conflict', HttpStatus.CONFLICT);
   }
 
   async findAll(): Promise<IreturnUser[]> {
@@ -78,7 +105,7 @@ export class UserService {
   async findOneById(id: number): Promise<IreturnUser> {
     const user = await this.userRepository
       .createQueryBuilder('id')
-      .where('user.id=:id', { id })
+      .where('id=:id', { id })
       .getOneOrFail()
       .catch((error) => {
         console.log('error', error);
@@ -86,33 +113,6 @@ export class UserService {
       });
     const { password, ...data } = user;
     return data;
-  }
-
-  async findForLogin({ email, password }: LoginUserDto): Promise<any> {
-    const user = await this.userRepository
-      .createQueryBuilder('user')
-      .where('user.email=:email', { email })
-      .getOneOrFail()
-      .catch((error) => {
-        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
-        console.log(error.message);
-      });
-    if (user.password !== password) {
-      return 'error';
-    }
-    const payload = { id: user.id, name: user.first_name };
-    const secret = 'secret word';
-    const token = jwt.sign(payload, secret);
-    const result = {
-      id: user.id,
-      first_name: user.first_name,
-      role: user.role,
-      is_blocked: user.is_blocked,
-      token,
-    };
-
-    console.log(result);
-    return result;
   }
 
   async blockUser(dto: BlockUserDto): Promise<IreturnUser> {
@@ -155,5 +155,30 @@ export class UserService {
     } catch (e) {
       console.log(e.message);
     }
+  }
+  async findUserList(role: string): Promise<IreturnUserList[]> {
+    const returnList = () => {
+      if (role === UserRole.SUPER_ADMIN) {
+        return [UserRole.EMPLOYEE, UserRole.ADMIN];
+      } else if (role === UserRole.ADMIN) {
+        return [UserRole.EMPLOYEE];
+      }
+    };
+
+    const adminUserList = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.role IN (:...roles)', {
+        roles: returnList(),
+      })
+      .select('user.id')
+      .addSelect('first_name')
+      .addSelect('last_name')
+      .addSelect('is_blocked')
+      .getRawMany()
+      .catch((error) => {
+        console.log('error', error);
+        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      });
+    return adminUserList;
   }
 }

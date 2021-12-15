@@ -1,4 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  OneToMany,
+} from 'typeorm';
 import { DaysOff } from './daysOff.entity';
 export enum UserRole {
   EMPLOYEE = 'employee',
@@ -33,28 +39,12 @@ export class User {
   @Column({ default: false })
   is_blocked: boolean;
 
-  @Column({ type: Date })
+  @CreateDateColumn({ type: Date })
   created_at: Date;
-  @Column()
+
+  @Column({ default: '' })
   token: string;
 
   @OneToMany(() => DaysOff, (daysOff) => daysOff.user)
   daysOff: DaysOff[];
-}
-
-@Entity()
-export class UserMail {
-  @PrimaryGeneratedColumn()
-  id: string;
-
-  @Column()
-  first_name: string;
-
-  @Column()
-  last_name: string;
-
-  @Column()
-  email: string;
-  @Column()
-  password: string;
 }
