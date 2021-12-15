@@ -9,6 +9,7 @@ import {
   UpdateUserDto,
   LoginUserDto,
   BlockUserDto,
+  UpdateUserPassDto,
 } from './user.dto';
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
@@ -182,7 +183,7 @@ export class UserService {
       });
     return adminUserList;
   }
-   async updatePassUser(dto: UpdateUserPassDto): Promise<IreturnUser> {
+  async updatePassUser(dto: UpdateUserPassDto): Promise<IreturnUser> {
     const saltOrRounds = 10;
     const hash = bcrypt.hashSync(dto.password, saltOrRounds);
 

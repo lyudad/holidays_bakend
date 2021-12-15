@@ -2,8 +2,6 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MailService } from './mail.service';
-import { MailController } from './mail.controller';
-import { CreatePassService } from './userPass.service';
 
 @Module({
   imports: [
@@ -23,8 +21,8 @@ import { CreatePassService } from './userPass.service';
       },
     }),
   ],
-  controllers: [MailController],
-  providers: [CreatePassService, MailService],
+  controllers: [],
+  providers: [MailService],
   exports: [MailService],
 })
 export class EmailModule {}
