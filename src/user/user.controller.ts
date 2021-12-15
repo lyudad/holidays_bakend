@@ -41,7 +41,7 @@ export class UserController {
   findAll(): Promise<IreturnUser[]> {
     return this.userService.findAll();
   }
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Post('/mail')
   postUser(@Body() dto: any): any {
     return this.userService.createPass(dto);
