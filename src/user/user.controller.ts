@@ -41,7 +41,11 @@ export class UserController {
   findAll(): Promise<IreturnUser[]> {
     return this.userService.findAll();
   }
-
+  @UseGuards(JwtAuthGuard)
+  @Post('/mail')
+  postUser(@Body() dto: any): any {
+    return this.userService.createPass(dto);
+  }
   @UseGuards(JwtAuthGuard)
   @Get('/:id')
   findOneById(@Param('id') id: number): Promise<IreturnUser> {

@@ -9,12 +9,14 @@ import {
   UpdateUserDto,
   LoginUserDto,
   BlockUserDto,
+  UpdateUserPassDto,
 } from './user.dto';
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 import { IreturnUser, IreturnUserList } from './user.types';
 import { MailService } from '../mail/mail.service';
 import { IUserMail } from './user.types';
+import { CreatePasswordDto } from 'src/mail/mail.dto';
 
 @Injectable()
 export class UserService {
@@ -180,5 +182,48 @@ export class UserService {
         throw new HttpException('Not found', HttpStatus.NOT_FOUND);
       });
     return adminUserList;
+  }
+  async updatePassUser(dto: UpdateUserPassDto): Promise<IreturnUser> {
+    const saltOrRounds = 10;
+    const hash = bcrypt.hashSync(dto.password, saltOrRounds);
+
+    try {
+      const userData = await this.findOne(dto);
+      if (!userData) {
+        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      }
+      const updateUser = { ...userData, ...{ password: hash } };
+      await this.userRepository
+        .createQueryBuilder()
+        .update(User)
+        .set({
+          id: updateUser.id,
+          first_name: updateUser.first_name,
+          last_name: updateUser.last_name,
+          email: updateUser.email,
+          password: updateUser.password,
+          role: updateUser.role,
+          is_blocked: updateUser.is_blocked,
+        })
+        .where('email = :email', { email: dto.email })
+        .execute();
+
+      const { password, ...data } = updateUser;
+      return data;
+    } catch (e) {
+      console.log(e.message);
+    }
+  }
+  async createPass(dto: CreatePasswordDto): Promise<IUserMail> {
+    const uid = new ShortUniqueId();
+    const newPassword = uid.stamp(10);
+
+    const user = {
+      ...dto,
+      password: newPassword,
+    };
+    await this.updatePassUser(user);
+    await this.mailService.sendPassword(user);
+    return user;
   }
 }
