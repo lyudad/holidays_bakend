@@ -117,3 +117,17 @@ export class BlockUserDto {
   @IsBoolean()
   is_blocked: boolean;
 }
+export class UpdateUserPassDto {
+  @IsString()
+  first_name: string;
+
+  @IsString()
+  last_name: string;
+
+  @IsString()
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  password: string;
+}
