@@ -39,6 +39,7 @@ export class UserService {
     if (!user) {
       const uid = new ShortUniqueId();
       const genPassword = uid.stamp(10);
+      console.log(genPassword);
       const saltOrRounds = 10;
       const hash = bcrypt.hashSync(genPassword, saltOrRounds);
       const userToMail: IUserMail = {
