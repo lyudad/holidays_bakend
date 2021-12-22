@@ -138,9 +138,6 @@ export class UserService {
       if (!userData) {
         throw new HttpException('Not found', HttpStatus.NOT_FOUND);
       }
-      if (first_name === '' || last_name === '' || email === '') {
-        throw new HttpException('Incorrect data', HttpStatus.BAD_REQUEST);
-      }
       const updateUser = { ...userData, ...dto };
       const saveUpdateUser = await this.userRepository
         .createQueryBuilder()
@@ -158,7 +155,6 @@ export class UserService {
         });
 
       const { password, ...data } = updateUser;
-      console.log(saveUpdateUser, 'update');
       return data;
     } catch (e) {
       console.log(e.message);
