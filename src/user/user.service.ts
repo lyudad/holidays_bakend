@@ -158,6 +158,7 @@ export class UserService {
       return data;
     } catch (e) {
       console.log(e.message);
+      throw new HttpException('Conflict', HttpStatus.CONFLICT);
     }
   }
 
