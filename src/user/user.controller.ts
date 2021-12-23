@@ -28,8 +28,8 @@ export class UserController {
   blockUser(@Body() dto: BlockUserDto): Promise<IreturnUser> {
     return this.userService.blockUser(dto);
   }
-  @UseGuards(JwtAuthGuard)
-  @Patch('/:id')
+  // @UseGuards(JwtAuthGuard)
+  @Patch('update/:id')
   updateUser(
     @Param('id') id: number,
     @Body() updateUserDto: UpdateUserDto,

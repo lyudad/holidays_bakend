@@ -131,6 +131,8 @@ export class UserService {
   }
 
   async updateUser(dto: UpdateUserDto): Promise<IreturnUser> {
+    const { first_name, last_name, email } = dto;
+
     try {
       const userData = await this.userRepository.findOne(dto.id);
       if (!userData) {
@@ -141,23 +143,25 @@ export class UserService {
         .createQueryBuilder()
         .update(User)
         .set({
-          id: updateUser.id,
           first_name: updateUser.first_name,
           last_name: updateUser.last_name,
           email: updateUser.email,
-          password: updateUser.password,
-          role: updateUser.role,
-          is_blocked: updateUser.is_blocked,
         })
         .where('id = :id', { id: dto.id })
-        .execute();
+        .execute()
+        .catch((error) => {
+          console.log('error', error);
+          throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+        });
 
       const { password, ...data } = updateUser;
       return data;
     } catch (e) {
       console.log(e.message);
+      throw new HttpException('Conflict', HttpStatus.CONFLICT);
     }
   }
+
   async findUserList(role: string): Promise<IreturnUserList[]> {
     const returnList = () => {
       if (role === UserRole.SUPER_ADMIN) {
@@ -175,6 +179,7 @@ export class UserService {
       .select('user.id')
       .addSelect('first_name')
       .addSelect('last_name')
+      .addSelect('email')
       .addSelect('is_blocked')
       .getRawMany()
       .catch((error) => {
