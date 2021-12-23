@@ -153,11 +153,11 @@ export class UserService {
           console.log('error', error);
           throw new HttpException('Not found', HttpStatus.NOT_FOUND);
         });
-
       const { password, ...data } = updateUser;
       return data;
-    } catch (e) {
-      console.log(e.message);
+    } catch (err: any) {
+      throw new HttpException('Conflict', HttpStatus.CONFLICT);
+      console.log(err.message);
     }
   }
 
