@@ -48,4 +48,14 @@ export class UserController {
   findOneById(@Param('id') id: number): Promise<IreturnUser> {
     return this.userService.findOneById(id);
   }
+  @UseGuards(JwtAuthGuard)
+  @Get('/:id')
+  deleteById(@Param('id') id: number): Promise<void> {
+    return this.userService.deleteById(id);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Post('/block/:id')
+  toggleBlockUser(@Param('id') id: number): Promise<IreturnUser> {
+    return this.userService.toggleBlockUser(id);
+  }
 }

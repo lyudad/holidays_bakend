@@ -229,7 +229,7 @@ export class UserService {
     await this.mailService.sendPassword(user);
     return user;
   }
-    async deleteById(id: number): Promise<void> {
+  async deleteById(id: number): Promise<void> {
     try {
       const userData = await this.findOneById(id);
       if (!userData) {
@@ -253,7 +253,8 @@ export class UserService {
       if (!user) {
         throw new HttpException('Not found', HttpStatus.NOT_FOUND);
       }
-      const isBlock = !user.is_blocked;
+      user.is_blocked = !user.is_blocked;
+      const isBlock = user.is_blocked;
       await this.userRepository
         .createQueryBuilder()
         .update(User)
