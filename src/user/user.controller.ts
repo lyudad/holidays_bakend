@@ -6,6 +6,7 @@ import {
   Post,
   Patch,
   UseGuards,
+  Delete,
 } from '@nestjs/common';
 import { CreateUserDto, UpdateUserDto, BlockUserDto } from './user.dto';
 import { UserService } from './user.service';
@@ -49,7 +50,7 @@ export class UserController {
     return this.userService.findOneById(id);
   }
   @UseGuards(JwtAuthGuard)
-  @Get('/:id')
+  @Delete('/:id')
   deleteById(@Param('id') id: number): Promise<void> {
     return this.userService.deleteById(id);
   }

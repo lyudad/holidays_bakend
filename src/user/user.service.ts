@@ -241,7 +241,6 @@ export class UserService {
         .from(User)
         .where('id = :id', { id })
         .execute();
-      throw new HttpException('Delete', HttpStatus.OK);
     } catch (e) {
       throw new HttpException('Conflict', HttpStatus.CONFLICT);
       console.log(e.message);
