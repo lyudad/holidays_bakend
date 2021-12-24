@@ -39,4 +39,6 @@ export class DaysOff {
     default: statusType.PENDING,
   })
   status: statusType;
+  @Column()
+  userId: string;
 }

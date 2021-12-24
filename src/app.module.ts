@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { EmailModule } from './mail/mail.module';
+import { DaysOffModule } from './daysOff/daysOff.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { EmailModule } from './mail/mail.module';
     UserModule,
     AuthModule,
     EmailModule,
+    DaysOffModule,
   ],
   controllers: [AppController],
   providers: [AppService],
