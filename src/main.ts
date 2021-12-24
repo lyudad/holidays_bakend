@@ -1,14 +1,14 @@
 import 'reflect-metadata';
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
-dotenv.config();
+dotenv.config({ path: __dirname + './env' });
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3030 } = process.env;
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { cors: true });
   await app.listen(PORT);
 }
 bootstrap();
