@@ -2,9 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  Header,
-  HttpCode,
-  HttpStatus,
   Param,
   Post,
   Patch,
@@ -13,7 +10,7 @@ import {
 import { CreateUserDto, UpdateUserDto, BlockUserDto } from './user.dto';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { IreturnUser, ICreateUser } from './user.types';
+import { IreturnUser } from './user.types';
 
 @Controller('/user')
 export class UserController {
@@ -29,7 +26,7 @@ export class UserController {
     return this.userService.blockUser(dto);
   }
   @UseGuards(JwtAuthGuard)
-  @Patch('/:id')
+  @Patch('update/:id')
   updateUser(
     @Param('id') id: number,
     @Body() updateUserDto: UpdateUserDto,
