@@ -131,21 +131,20 @@ export class UserService {
   }
 
   async updateUser(dto: UpdateUserDto): Promise<IreturnUser> {
-    const { first_name, last_name, email } = dto;
-
     try {
       const userData = await this.userRepository.findOne(dto.id);
       if (!userData) {
         throw new HttpException('Not found', HttpStatus.NOT_FOUND);
       }
       const updateUser = { ...userData, ...dto };
+      const { first_name, last_name, email } = updateUser;
       const saveUpdateUser = await this.userRepository
         .createQueryBuilder()
         .update(User)
         .set({
-          first_name: updateUser.first_name,
-          last_name: updateUser.last_name,
-          email: updateUser.email,
+          first_name,
+          last_name,
+          email,
         })
         .where('id = :id', { id: dto.id })
         .execute()
