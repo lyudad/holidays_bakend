@@ -16,8 +16,8 @@ module.exports = {
         TOKEN_EXPIRATION: 3600,
         MAIL_PORT: 465,
         MAIL_HOST: 'smtp.meta.ua',
-        MAIL_ID: 'zenbit_holidays@meta.ua',
-        MAIL_PASS: '0212Zenbit&Hol'
+        MAIL_ID: 'zenbit@meta.ua',
+        MAIL_PASS: '2412Holidays2021',
       },
     },
     {

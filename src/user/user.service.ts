@@ -230,4 +230,43 @@ export class UserService {
     await this.mailService.sendPassword(user);
     return user;
   }
+  async deleteById(id: number): Promise<void> {
+    try {
+      const userData = await this.findOneById(id);
+      if (!userData) {
+        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      }
+      await this.userRepository
+        .createQueryBuilder()
+        .delete()
+        .from(User)
+        .where('id = :id', { id })
+        .execute();
+    } catch (e) {
+      throw new HttpException('Conflict', HttpStatus.CONFLICT);
+      console.log(e.message);
+    }
+  }
+  async toggleBlockUser(id: number): Promise<IreturnUser> {
+    try {
+      const user = await this.findOneById(id);
+      if (!user) {
+        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      }
+      user.is_blocked = !user.is_blocked;
+      const isBlock = user.is_blocked;
+      await this.userRepository
+        .createQueryBuilder()
+        .update(User)
+        .set({
+          is_blocked: isBlock,
+        })
+        .where('id = :id', { id })
+        .execute();
+      return user;
+    } catch (e) {
+      throw new HttpException('Conflict', HttpStatus.CONFLICT);
+      console.log(e.message);
+    }
+  }
 }

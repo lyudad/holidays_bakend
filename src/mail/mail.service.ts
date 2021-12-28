@@ -8,7 +8,7 @@ export class MailService {
   async sendPassword(user: IUserMail): Promise<void> {
     return this.mailerService.sendMail({
       to: `${user.email}`,
-      from: 'zenbit_holidays@meta.ua',
+      from: process.env.MAIL_ID,
       subject: 'Welcome to Holidays!',
       text: 'Use this password',
       html: `<b>Hello, ${user.first_name}, your new password: ${user.password}</b>`,
