@@ -13,7 +13,7 @@ import { daysOffType, statusType } from 'src/entities/daysOff.entity';
 export class CreateDaysOffDto {
   @IsNotEmpty()
   @IsString()
-  readonly user_id: string;
+  readonly userId: string;
 
   @IsNotEmpty()
   @IsDate()
@@ -35,8 +35,8 @@ export class CreateDaysOffDto {
   })
   readonly type: daysOffType;
 
-  @IsDate()
-  readonly created_at: Date;
+  // @IsDate()
+  // readonly created_at: Date;
 }
 
 export class UpdateDaysOffDto {
