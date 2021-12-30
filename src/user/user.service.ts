@@ -1,5 +1,4 @@
 import { HttpStatus, HttpException, Injectable } from '@nestjs/common';
-// import { InjectRepository } from '@nestjs/typeorm';
 import ShortUniqueId from 'short-unique-id';
 import { UserRepository } from './user.repository';
 import { User, UserRole } from 'src/entities/user.entity';
@@ -268,5 +267,21 @@ export class UserService {
       throw new HttpException('Conflict', HttpStatus.CONFLICT);
       console.log(e.message);
     }
+  }
+  async findHrMail(): Promise<any> {
+    const returnList = [UserRole.ADMIN, UserRole.SUPER_ADMIN];
+    const hrList = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.role IN (:...roles)', {
+        roles: returnList,
+      })
+      .select('email')
+      .getMany()
+      .catch((error) => {
+        console.log(error);
+        throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+      });
+    console.log(hrList);
+    return hrList;
   }
 }

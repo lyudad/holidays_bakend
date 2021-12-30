@@ -19,8 +19,10 @@ export class DaysOffController {
   constructor(private daysOffService: DaysOffService) {}
   @UseGuards(JwtAuthGuard)
   @Post('/create')
-  async createDaysOff(@Body() createDaysOffDto: CreateDaysOffDto) {
-    return 'создание записи о dayOff от employee';
+  async createDaysOff(
+    @Body() createDaysOffDto: CreateDaysOffDto,
+  ): Promise<any> {
+    return this.daysOffService.createDaysOff(createDaysOffDto);
   }
   @UseGuards(JwtAuthGuard)
   @Get('/:id')
